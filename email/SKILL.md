@@ -47,10 +47,9 @@ a blank line, then the body:
     printf 'From: Sunny <sunny@waywardlane.com>\nTo: x@y.com\nSubject: ...\n\nBody...\n' \
       | himalaya message send
 
-IMPORTANT — partial-failure trap: the SMTP send happens FIRST, then himalaya tries to save a
-copy to the Sent folder. If the save step errors, the mail was STILL SENT. Do NOT blindly resend
-or you will deliver duplicates. (See save-copy note below — it is disabled, so this should not
-recur.)
+IMPORTANT — partial-failure trap: the SMTP send happens FIRST. If a later step (or the command
+overall) errors, the mail may ALREADY be sent. Do NOT blindly resend or you will deliver
+duplicates — verify in Sent ("[Gmail]/Sent Mail") before resending.
 
 (Once command-permissioning lands, "himalaya ... send" will be hard-gated and require an explicit
 approval. Until then, the confirmation above is your gate — do not skip it.)
@@ -75,9 +74,15 @@ If reconfiguring from scratch:
   (op://<vault-uuid>/<item-uuid>/<field-id>).
 - **config.toml encryption field is a tagged enum**: use `backend.encryption.type = "tls"`
   (and same for message.send.backend.encryption.type), NOT `backend.encryption = "tls"`.
-- **Disable himalaya's save-copy**: set `message.send.save-copy = false`. Otherwise himalaya tries
-  to save to a "Sent" folder that doesn't exist under Gmail's naming and errors AFTER sending.
-  Gmail's SMTP auto-files sent mail in "[Gmail]/Sent Mail" anyway.
+- **Folder aliases use the PLURAL key**: `folder.aliases.sent` / `.drafts` / `.trash` — NOT the
+  singular `folder.alias.*`, which himalaya v1.2.0 SILENTLY IGNORES (pimalaya/himalaya#669; the
+  singular form only works on master, post-1.2.0). With the singular key himalaya looks for a
+  literal "Sent" folder, which Gmail doesn't have, and `message send` errors "Folder doesn't
+  exist". Map to Gmail's names: `folder.aliases.sent = "[Gmail]/Sent Mail"`,
+  `.drafts = "[Gmail]/Drafts"`, `.trash = "[Gmail]/Trash"`.
+- **save-copy stays off**: `message.send.save-copy = false` — Gmail's SMTP already files sent mail
+  in "[Gmail]/Sent Mail", so a second himalaya-saved copy would DUPLICATE it. This is correct for
+  Gmail; it is NOT the fix for the folder error above — the plural alias is.
 - Auth command in config reads the injected var: `printf '%s' "$HIMALAYA_PASSWORD"`.
 - Gmail hosts: IMAP imap.gmail.com:993, SMTP smtp.gmail.com:465, both encryption.type "tls".
 
