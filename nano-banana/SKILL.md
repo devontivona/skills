@@ -26,14 +26,14 @@ per image. Every image is saved with a sidecar `.txt` recording the model + prom
 |-------|-------|------|
 | `nb2` (default) | gemini-3.1-flash-image | Fast, high quality — the everyday choice |
 | `pro` | gemini-3-pro-image | Highest fidelity, complex scenes, text-in-image, detailed diagrams |
-| `v1` | gemini-2.5-flash-image | Older/cheaper fallback |
 
-Pass `--model pro` etc., or any full model name. Override default with env `NANOBANANA_MODEL`.
+Only these two are used (Nano Banana 2 and Pro — never the older v1). Pass `--model pro`, or any
+full model name. Override default with env `NANOBANANA_MODEL`.
 
 ## Commands
 
     # Text-to-image
-    nanobanana.py generate --prompt "<desc>" [--out path] [--model nb2|pro|v1]
+    nanobanana.py generate --prompt "<desc>" [--out path] [--model nb2|pro]
                            [--aspect 1:1|16:9|9:16|4:3|3:4|...] [--n 1-4] [--ref a.png b.png]
 
     # Edit / restore / compose (feed one or more input images)

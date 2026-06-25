@@ -12,16 +12,15 @@ Usage:
                          [--aspect 16:9] [--n 1] [--ref a.png b.png]
   nanobanana.py edit --prompt "add sunglasses" --image in.png [--out out.png] [--model nb2]
 
-Model aliases: nb2 (gemini-3.1-flash-image, default) | pro (gemini-3-pro-image) |
-               v1 (gemini-2.5-flash-image). Or pass any full model name.
+Model aliases: nb2 (gemini-3.1-flash-image, default) | pro (gemini-3-pro-image).
+               Only Nano Banana 2 and Pro are used. Or pass any full model name.
 Env override: NANOBANANA_MODEL.
 """
 import argparse, base64, json, mimetypes, os, sys, time, urllib.request, urllib.error
 
 MODELS = {
-    "nb2": "gemini-3.1-flash-image",
-    "pro": "gemini-3-pro-image",
-    "v1":  "gemini-2.5-flash-image",
+    "nb2": "gemini-3.1-flash-image",  # Nano Banana 2 — default, fast, high quality
+    "pro": "gemini-3-pro-image",      # Nano Banana Pro — highest fidelity, text-in-image, diagrams
 }
 DEFAULT_MODEL = "nb2"
 ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
