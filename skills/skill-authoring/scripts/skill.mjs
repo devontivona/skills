@@ -13,8 +13,8 @@
 //   skill rm   <name>                           remove the skill → commit → push
 //
 // This file is BUNDLED INTO the `skill-authoring` seed skill: `initSkills` installs
-// it at ~/.sunny/skills/skill-authoring/scripts/skill.mjs, so it travels with the
-// skill (into the canonical skill repo on push) and needs no global install — the
+// it at ~/.sunny/skills/authored/skills/skill-authoring/scripts/skill.mjs, so it travels
+// with the skill (into the canonical skill repo on push) and needs no global install — the
 // skill body invokes it with `node`. Plain Node + git only (no build step, no tsx)
 // so it runs on any host as-is. It is the deterministic counterpart of the in-process
 // helpers in `src/skills/index.ts`; the small validation/slug logic below is
@@ -22,14 +22,7 @@
 // `sanitizeSkillName`/`validateSkill` there — keep them in sync.
 
 import { execFileSync } from 'node:child_process';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  realpathSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -86,7 +79,9 @@ export function validate(raw) {
 /** Compose a starter SKILL.md (frontmatter + body) from fields. */
 export function composeSkill({ name, description, body }) {
   const slug = sanitizeName(name);
-  const desc = String(description).trim().replace(/\s*\n\s*/g, ' ');
+  const desc = String(description)
+    .trim()
+    .replace(/\s*\n\s*/g, ' ');
   return `---\nname: ${slug}\ndescription: ${desc}\n---\n\n${String(body).trim()}\n`;
 }
 
@@ -95,6 +90,21 @@ export function composeSkill({ name, description, body }) {
 /** Resolve the runtime dir the same way the app does (SUNNY_HOME → ~/.sunny). */
 function runtimeDir() {
   return process.env.SUNNY_HOME ?? join(homedir(), '.sunny');
+}
+
+/** The authored tier's CLONE/repository root — `~/.sunny/skills/authored`, the cwd for
+ *  its git ops (commit/push/sync). Mirrors `authoredRoot` in index.ts. */
+function cloneRoot() {
+  return join(runtimeDir(), 'skills', 'authored');
+}
+
+/** The PRIMARY (writable) skill root — `~/.sunny/skills/authored/skills` (D-SK8). The
+ *  canonical repo uses the spec `skills/<name>/SKILL.md` layout, so self-authored skills
+ *  are written here (and committed/pushed from {@link cloneRoot}). `trusted/` (owned
+ *  mirrors) and `installed/` (third-party) are read-only/untrusted and never touched by
+ *  this helper. Mirrors `skillsPaths` in index.ts. */
+function authoredRoot() {
+  return join(cloneRoot(), 'skills');
 }
 
 function git(args, cwd) {
@@ -110,28 +120,28 @@ function hasRemote(cwd) {
 }
 
 /**
- * Stage + commit the skills tree, and push when the working copy is its own repo
- * (a clone of the canonical skill repo, D-SK8) with a remote configured. Mirrors
- * `commitSkillChange` in src/skills/index.ts. Returns what happened so the caller
- * can report it. Best-effort push: offline → committed locally.
+ * Stage + commit the authored skills tree, and push when a remote is configured.
+ * All git ops run in the authored CLONE root (the skill files live one level down
+ * under `skills/`, but the repo is the clone root). Mirrors `commitSkillChange` in
+ * src/skills/index.ts. Returns what happened so the caller can report it. Best-effort
+ * push: offline → committed locally.
  */
-function gitPersist(dir, message) {
-  const root = join(dir, 'skills');
-  const ownRepo = existsSync(join(root, '.git'));
-  const cwd = ownRepo ? root : dir;
-  if (!ownRepo && !existsSync(join(dir, '.git'))) {
-    return { committed: false, pushed: false, note: 'no git repo — saved to disk only' };
+function gitPersist(_dir, message) {
+  const root = cloneRoot();
+  if (!existsSync(join(root, '.git'))) {
+    return { committed: false, pushed: false, note: 'no git clone — saved to disk only' };
   }
-  git(['add', '-A', ...(ownRepo ? [] : ['skills'])], cwd);
+  git(['add', '-A'], root);
   try {
-    git(['commit', '-q', '-m', message], cwd);
+    git(['commit', '-q', '-m', message], root);
   } catch (err) {
     const blob = `${err?.stdout ?? ''}${err?.stderr ?? ''}${err?.message ?? ''}`;
-    if (/nothing to commit/i.test(blob)) return { committed: false, pushed: false, note: 'nothing changed' };
+    if (/nothing to commit/i.test(blob))
+      return { committed: false, pushed: false, note: 'nothing changed' };
     throw err;
   }
   let pushed = false;
-  if (ownRepo && hasRemote(root)) {
+  if (hasRemote(root)) {
     try {
       git(['push', '--quiet'], root);
       pushed = true;
@@ -161,7 +171,7 @@ function done(msg) {
 function cmdNew(name, description) {
   const slug = sanitizeName(name);
   if (!description) fail('`new` requires a description: skill new <name> -d "what triggers it"');
-  const dir = join(runtimeDir(), 'skills', slug);
+  const dir = join(authoredRoot(), slug);
   const file = join(dir, 'SKILL.md');
   if (existsSync(file)) fail(`skill "${slug}" already exists at ${dir}`);
   const raw = composeSkill({
@@ -173,12 +183,14 @@ function cmdNew(name, description) {
   if (!v.ok) fail(`invalid: ${v.errors.join('; ')}`);
   mkdirSync(dir, { recursive: true });
   writeFileSync(file, raw, { mode: 0o644 });
-  done(`scaffolded ${dir}\n  edit SKILL.md (and add any scripts/ references/ assets/), then: skill save ${slug}`);
+  done(
+    `scaffolded ${dir}\n  edit SKILL.md (and add any scripts/ references/ assets/), then: skill save ${slug}`,
+  );
 }
 
 function cmdSave(name) {
   const slug = sanitizeName(name);
-  const file = join(runtimeDir(), 'skills', slug, 'SKILL.md');
+  const file = join(authoredRoot(), slug, 'SKILL.md');
   if (!existsSync(file)) fail(`no SKILL.md for "${slug}" — run: skill new ${slug} -d "..."`);
   const v = validate(readFileSync(file, 'utf8'));
   if (!v.ok) fail(`invalid SKILL.md: ${v.errors.join('; ')}`);
@@ -188,11 +200,54 @@ function cmdSave(name) {
 
 function cmdRm(name) {
   const slug = sanitizeName(name);
-  const dir = join(runtimeDir(), 'skills', slug);
+  const dir = join(authoredRoot(), slug);
   if (!existsSync(dir)) fail(`no skill named "${slug}"`);
   rmSync(dir, { recursive: true, force: true });
   const r = gitPersist(runtimeDir(), `skill: delete ${slug}`);
   done(`deleted "${slug}"${persistSuffix(r)}.`);
+}
+
+function gitErrMsg(err) {
+  return String(err?.stderr || err?.stdout || err?.message || err)
+    .trim()
+    .split('\n')[0];
+}
+
+/** Pull the latest skills from the canonical repo, fast-forward only. Mirrors
+ *  `syncSkillRepo` in src/skills/index.ts — never auto-merges; reports divergence
+ *  for the owner to reconcile. On-demand counterpart of the hourly background sync. */
+function cmdSync() {
+  const root = cloneRoot();
+  if (!existsSync(join(root, '.git'))) fail('skills dir is not a git clone — nothing to sync');
+  try {
+    git(['fetch', '--quiet'], root);
+  } catch (err) {
+    fail(`fetch failed (offline?): ${gitErrMsg(err)}`);
+  }
+  let upstream;
+  try {
+    upstream = git(['rev-parse', '--abbrev-ref', '@{u}'], root).trim();
+  } catch {
+    fail('no upstream tracking branch configured for the skills clone');
+  }
+  const behind = Number(git(['rev-list', '--count', '@..@{u}'], root).trim());
+  const ahead = Number(git(['rev-list', '--count', '@{u}..@'], root).trim());
+  if (behind === 0) {
+    done(
+      ahead > 0
+        ? `up to date (${ahead} local commit(s) not yet pushed)`
+        : 'up to date — no new skills',
+    );
+    return;
+  }
+  if (ahead > 0) {
+    fail(
+      `diverged: ${ahead} local + ${behind} remote commit(s). Reconcile manually in ${root} ` +
+        `(e.g. git pull --rebase), then save again — not auto-merging.`,
+    );
+  }
+  git(['merge', '--ff-only', '--quiet', upstream], root);
+  done(`pulled ${behind} update(s) from ${upstream}.`);
 }
 
 const USAGE = `skill — author Sunny's own skills (a skill is a directory: SKILL.md + optional scripts/ references/ assets/)
@@ -201,6 +256,7 @@ usage:
   skill new <name> -d "trigger description"   scaffold a draft skill directory
   skill save <name>                           validate, commit, and push the skill
   skill rm <name>                             delete the skill, commit, and push
+  skill sync                                  pull the latest skills from the repo (fast-forward only)
 
 write/edit the skill's files with your normal file tools, then 'skill save <name>'.`;
 
@@ -224,6 +280,8 @@ export function main(argv) {
     case 'delete':
       if (!args[0]) fail('`rm` requires a name');
       return cmdRm(args[0]);
+    case 'sync':
+      return cmdSync();
     case 'help':
     case '--help':
     case '-h':
