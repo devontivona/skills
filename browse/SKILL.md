@@ -70,3 +70,6 @@ references/per-site-skills.md.
   owner's credentialed sessions (cloud is for un-credentialed research only).
 - Credentialed actions that act as the owner (purchases, sending, settings changes) get the
   owner's confirmation first — same posture as sending email.
+- Anti-bot (BOTH modes): on every launch, pass `--headed --init-script ~/.sunny/browse-stealth/stealth.js`
+  under `xvfb-run -a` (Xvfb is installed). Passes the full rebrowser detector suite. Safe for
+  credentialed/--profile sessions. See references/agent-browser.md → "Stealth / anti-bot".

@@ -148,3 +148,48 @@ posture holds. Don't use cloud browser infra for credentialed flows.
 How to operate a *specific* site is a separate, loadable skill — see
 `references/per-site-skills.md`. Those skills are engine-agnostic SKILL.md files executed over the
 browse engine's verbs; they're not bound to agent-browser.
+
+## Stealth / anti-bot (Sunny-specific)
+
+Default headless agent-browser leaks two obvious tells that Cloudflare/Reddit/DataDome flag
+instantly: `navigator.webdriver === true` and a `HeadlessChrome` User-Agent. The fix below
+applies to BOTH modes (research AND credentialed/--profile) — it acts at browser launch and is
+safe for logged-in sessions (it masks automation tells only; never touches cookies/auth).
+
+```bash
+REAL_UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+agent-browser --init-script ~/.sunny/browse-stealth/stealth.js open "<url>"
+agent-browser set headers "{\"User-Agent\": \"$REAL_UA\"}"   # match the HTTP header to the JS UA
+```
+
+The init script (`~/.sunny/browse-stealth/stealth.js`) deletes `navigator.webdriver`, strips
+"Headless" from `navigator.userAgent`, ensures `window.chrome.runtime`, and fixes the
+notifications permission mismatch. It runs before page scripts and is safe for credentialed
+sessions too (masking only). Keep the UA's Chrome major version roughly current.
+
+### Headed via Xvfb (strongest, needs the package installed once)
+
+`--headed` is more detection-resistant than headless but needs a display. On this GUI-less
+server, run it under Xvfb (virtual framebuffer). One-time install (requires sudo):
+
+```bash
+sudo apt-get update && sudo apt-get install -y xvfb
+```
+
+Then launch headed under a virtual display:
+
+```bash
+xvfb-run -a --server-args="-screen 0 1920x1080x24" \
+  agent-browser --headed --init-script ~/.sunny/browse-stealth/stealth.js open "<url>"
+```
+
+Xvfb fixes the headless rendering/UA tells; the init script still handles `navigator.webdriver`
+(the automation flag, which headed mode does NOT clear on its own). Verify any time against
+https://bot-detector.rebrowser.net/ — eval `navigator.webdriver` and check the UA.
+
+**Status (2026-06): Xvfb installed; full rebrowser detector suite passes (all green) in BOTH
+research and --profile modes** — webdriver=false, own-props empty, clean Chrome UA + userAgentData,
+no Runtime.Enable/CDP leak. Always pass the `--init-script` and `--headed` flags on the launching
+`open` (they apply at launch; later subcommands attach to the running session). The init script
+cannot be set via shell rc/env reliably — the bash tool runs non-interactive shells — so pass the
+flag explicitly each launch.
