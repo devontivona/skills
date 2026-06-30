@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# gws-as <devon|sunny> <gws args...> — run gws as a specific Google identity.
+set -euo pipefail
+who="${1:-}"; shift || true
+case "$who" in
+  devon) export GOOGLE_WORKSPACE_CLI_CONFIG_DIR="$HOME/.config/gws-devon" ;;
+  sunny) export GOOGLE_WORKSPACE_CLI_CONFIG_DIR="$HOME/.config/gws-sunny" ;;
+  *) echo "usage: gws-as <devon|sunny> <gws args...>" >&2; exit 2 ;;
+esac
+exec gws "$@"
