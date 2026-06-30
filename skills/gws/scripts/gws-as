@@ -1,10 +1,39 @@
 #!/usr/bin/env bash
-# gws-as <devon|sunny> <gws args...> — run gws as a specific Google identity.
+# gws-as <handle> <gws args...> — run gws as a named Google identity.
+#
+# Identities live BY CONVENTION at ~/.config/gws-<handle> (e.g. gws-devon, gws-sunny,
+# gws-kate). Any handle works once its config dir is authed — no edit to this script.
+# Add a new identity with the headless login recipe in the gws skill.
+#   gws-as list            → show authed identities
+#   gws-as devon <args>    → run as that identity
 set -euo pipefail
+
+list_identities() {
+  echo "authed gws identities:"
+  local found=0
+  for d in "$HOME"/.config/gws-*; do
+    [ -d "$d" ] || continue
+    if [ -f "$d/credentials.enc" ] || [ -f "$d/credentials.json" ]; then
+      echo "  ${d##*/gws-}"
+      found=1
+    fi
+  done
+  [ "$found" = 0 ] && echo "  (none yet)"
+}
+
 who="${1:-}"; shift || true
-case "$who" in
-  devon) export GOOGLE_WORKSPACE_CLI_CONFIG_DIR="$HOME/.config/gws-devon" ;;
-  sunny) export GOOGLE_WORKSPACE_CLI_CONFIG_DIR="$HOME/.config/gws-sunny" ;;
-  *) echo "usage: gws-as <devon|sunny> <gws args...>" >&2; exit 2 ;;
-esac
+if [ "$who" = "list" ] || [ -z "$who" ]; then
+  list_identities
+  [ "$who" = "list" ] && exit 0
+  echo "usage: gws-as <handle> <gws args...>" >&2; exit 2
+fi
+
+dir="$HOME/.config/gws-$who"
+if [ ! -d "$dir" ]; then
+  echo "no gws identity '$who' (expected $dir)." >&2
+  echo "run the login recipe in the gws skill to add it, or:" >&2
+  list_identities >&2
+  exit 2
+fi
+export GOOGLE_WORKSPACE_CLI_CONFIG_DIR="$dir"
 exec gws "$@"

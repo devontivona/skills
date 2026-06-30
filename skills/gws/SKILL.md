@@ -9,17 +9,24 @@ description: "Run Google Workspace commands (Calendar, Drive, Tasks) as Devon or
 build, Node-independent). It talks to Google Workspace APIs for whichever identity its
 config dir is pointed at.
 
-## Two identities — ALWAYS use the wrapper
+## Identities — convention-based, one per person
 
-Never call `gws` bare for account work. Use `gws-as` (at `~/.local/bin/gws-as`, also
-bundled here at `scripts/gws-as`):
+Never call `gws` bare for account work. Use `gws-as <handle>` (at `~/.local/bin/gws-as`,
+also bundled here at `scripts/gws-as`):
 
-    gws-as devon <args>   # acts as devon@tivona.me  — Devon's calendar; invites send AS him
-    gws-as sunny <args>   # acts as sunny@waywardlane.com — Sunny's own calendar
+    gws-as list                 # show which identities are authed
+    gws-as devon  <args>        # run as devon@tivona.me
+    gws-as sunny  <args>        # run as sunny@waywardlane.com (Sunny's own)
 
-It just sets `GOOGLE_WORKSPACE_CLI_CONFIG_DIR` (devon → ~/.config/gws-devon,
-sunny → ~/.config/gws-sunny) then execs gws. Pick the identity deliberately: a calendar
-invite to Devon's guests must go out as **devon**.
+The wrapper is **convention-based, not a fixed list**: a handle `X` maps to the config dir
+`~/.config/gws-X`. Any handle works the moment that dir is authed — adding a new person
+needs NO edit to the wrapper or this skill. `devon`/`sunny` above are just examples.
+
+**Where the roster lives (memory, not here):** each person's Google account + their gws
+handle is recorded in memory — Devon in USER.md, Sunny in SUNNY.md, each family member in
+their `people:<id>` doc. To find the right handle for someone, check their memory doc (or
+run `gws-as list`). Pick the identity deliberately: a calendar invite to Devon's guests
+must go out as **devon**; act as a family member only for their own stuff.
 
 ## Syntax
 
@@ -69,14 +76,15 @@ Discover any method's schema:
 ## Adding a NEW Google account (headless OAuth login recipe)
 
 The box is headless, so the normal localhost-callback browser flow needs a relay through
-the user. Recipe (the same one used for both existing accounts):
+the user. Recipe (the same one used for the existing accounts). Pick a short handle for the
+person (e.g. `kate`); their config dir will be `~/.config/gws-<handle>`:
 
-1. Pick a config dir for the new identity, e.g. `~/.config/gws-<name>`, and drop a
+1. Pick a config dir for the new identity, e.g. `~/.config/gws-<handle>`, and drop a
    `client_secret.json` in it (reuse the existing OAuth client — see references below for
    the client_secret.json shape; it includes the desktop client_id/secret + project_id).
 2. Background the login so it prints its URL and waits on its callback port:
 
-       GOOGLE_WORKSPACE_CLI_CONFIG_DIR=~/.config/gws-<name> \
+       GOOGLE_WORKSPACE_CLI_CONFIG_DIR=~/.config/gws-<handle> \
          nohup bash -c 'gws auth login -s calendar,drive,tasks > /tmp/gwslogin.out 2>&1' & 
        sleep 6 && cat /tmp/gwslogin.out      # grab the printed accounts.google.com URL + its localhost:PORT
 
@@ -90,8 +98,12 @@ the user. Recipe (the same one used for both existing accounts):
 
    The waiting callback server catches it and finishes the token exchange. Verify:
 
-       gws-as <name> auth status        # has_refresh_token: true
-       gws-as <name> calendar calendarList list --format table
+       gws-as <handle> auth status        # has_refresh_token: true
+       gws-as <handle> calendar calendarList list --format table
+
+6. Record the new identity in memory so the roster stays current: the person's Google
+   address + their gws handle goes in their `people:<id>` doc (or USER.md/SUNNY.md for
+   Devon/Sunny). That — not this skill — is the source of truth for who maps to what.
 
 GOTCHAS learned:
 - Auth codes are ONE-TIME and short-lived. If the bg process already exited (timed out)
