@@ -126,6 +126,15 @@ is controlled by parameters, not an automation:
 If a light "keeps turning off while someone sits still," that's a **tuning problem** (raise
 108/112, shape geometry), NOT a reason to build an automation. See references/sensitivity.md.
 
+### Working example: time-based hold-time (day/night)
+A good use of an automation is flipping a *parameter* on a schedule while leaving presence
+native. Devon's "Main Floor mmWave Hold Time — day/night" (entity
+`automation.main_floor_mmwave_hold_time_day_night`): two `time` triggers (22:00 id=night,
+07:00 id=day) → `choose` by trigger id → `zwave_js.set_config_parameter` param 114 to 300
+(night, 5 min) or 7200 (day, 2 hr) on the 5 main-floor light entities. Presence stays 110=1;
+only the hold time changes, so a still-present person keeps the light on and the timer only
+starts once they leave. This is the preferred shape: automate the *tuning*, not the on/off.
+
 Historical note: an automation `living_room_off_after_1h_no_motion` was built for Kate's
 first switch as a workaround before we had the real docs. With param tuning it's unnecessary —
 prefer native 110=1. Only build an HA automation (`ha_config_set_automation`) when you need
