@@ -99,28 +99,38 @@ Quick map of the ones we use most (full table + descriptions in
 | 96 | Default All-LED Color When Off | 0–255 hue | LED bar color, load off |
 | 97 | Default All-LED Brightness When On | 0–100 | |
 | 98 | Default All-LED Brightness When Off | 0–100 | |
-| 108 | mmWave Stay Life | 50ms units (÷20 = sec) | how long presence "holds" after last detect |
-| 110 | Light On Presence Behavior | 0=manual … 1=auto on+off | **sensor→load mode**; 0 = sensor does NOT drive the load |
-| 114 | mmWave Detection Timeout | seconds | detection window |
+| 108 | mmWave Stay Life | seconds, 0-3600 (default 300) | how long a MOTIONLESS person still counts as present |
+| 110 | mmWave Load Behavior | 0-6 (default 1) | **1 = auto on+off = native presence lighting, no automation**; 0 = disabled |
+| 114 | mmWave Hold Time | seconds (default 10) | off-delay after presence lost; fleet=600 |
 
-**Param 110 is the big one for behavior:** set it to **0 (manual)** if you want the switch's
-built-in mmWave to *not* auto-control the load (e.g. you're driving lighting from an HA
-automation instead, or the built-in short timeout keeps killing the light). Default is 1
-(auto on+off). This bit Kate — see `topic:inovelli-switches`.
+**Param 110 is the big one for behavior.** Default 1 (Auto On/Off when Occupied) = full
+native presence lighting, on and off, no automation needed. Set it to **0** only to fully
+disable presence control of the load. Values 2–6 are one-way / inverted variants (see
+references/parameters.md). If presence "off" feels wrong, tune 114/108/112 rather than
+switching to manual+automation.
 
 Param 26 (Dimming Mode) is **read-only / locked by Inovelli** — do not attempt to write it
 (hardware-damage risk).
 
-## Automations
+## Presence lighting: use the NATIVE behavior, not an automation
 
-Presence lighting via HA automation (more flexible than the switch's built-in timeout):
-each switch has `binary_sensor.<name>_motion_detection`. Pattern that works well:
-trigger on motion sensor → `off` for the desired duration, condition light is on, action
-`light.turn_off`. With param 110=0 the switch won't fight the automation. Example live in
-Devon's HA: automation id `living_room_off_after_1h_no_motion` (see topic doc).
+**Default `param 110 = 1` (Auto On/Off when Occupied) already gives presence-driven ON and
+OFF for free — you do NOT need an HA automation for basic presence lighting.** The off-timing
+is controlled by parameters, not an automation:
+- `114` mmWave Hold Time — how long the load stays on after presence is lost (Devon's fleet
+  = 600s / 10 min; default is only 10s).
+- `108` mmWave Stay Life — how long a *motionless* person still counts as present (default
+  300s). Raise for sit-still rooms so the light doesn't drop while someone is barely moving.
+- `112` Sensitivity / `113` Trigger Speed / `101–106` geometry — detection tuning.
 
-Use `ha_config_set_automation` via the MCP to create these; confirm the YAML with
-Devon/Kate before writing (per the confirm-before-write rule in topic:home-assistant).
+If a light "keeps turning off while someone sits still," that's a **tuning problem** (raise
+108/112, shape geometry), NOT a reason to build an automation. See references/sensitivity.md.
+
+Historical note: an automation `living_room_off_after_1h_no_motion` was built for Kate's
+first switch as a workaround before we had the real docs. With param tuning it's unnecessary —
+prefer native 110=1. Only build an HA automation (`ha_config_set_automation`) when you need
+logic the switch genuinely can't do, e.g. time-of-day behavior or cross-device scenes. Confirm
+YAML with Devon/Kate before writing (confirm-before-write rule, topic:home-assistant).
 
 ## When a new switch is added
 1. `python3 scripts/inovelli.py list` — confirm it appears (model VZW32-SN, alive).
