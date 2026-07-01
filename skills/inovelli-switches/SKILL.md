@@ -141,6 +141,28 @@ prefer native 110=1. Only build an HA automation (`ha_config_set_automation`) wh
 logic the switch genuinely can't do, e.g. time-of-day behavior or cross-device scenes. Confirm
 YAML with Devon/Kate before writing (confirm-before-write rule, topic:home-assistant).
 
+## Scene buttons (the paddle + config button)
+
+Each switch exposes three `event.*_scene_00N` entities. **Confirmed mapping (VZW32-SN, 2026-07):**
+- `scene_001` = **OFF paddle** (bottom)
+- `scene_002` = **ON paddle** (top)
+- `scene_003` = **config button** (the small programmable button below the paddle) ← the one to hook for custom actions
+
+Event entity naming: `event.<switch>_scene_003`; a second switch sharing a base name gets
+`event.<switch>_scene_003_2` (e.g. kitchen cabinet = `event.kitchen_mmwave_dimmer_scene_003_2`).
+The entity's `state` is an ISO timestamp of the last press; the `event_type` attribute is the
+gesture: `KeyPressed` (1x), `KeyPressed2x`, `KeyPressed3x`, `KeyPressed4x`, `KeyPressed5x`,
+`KeyHeldDown`, `KeyReleased`. So one physical button gives you ~6 distinct triggers.
+
+### Reacting to a button press — the cross-machine bridge
+HA (riker) sees the press; anything you want to *run* may live on another box (e.g. houseparty
+on janeway). HA automations can't make an outbound HTTP/CLI call without `rest_command:` /
+`shell_command:` in `configuration.yaml` (YAML-only, needs an HA restart/reload — and can't be
+done through the MCP). So the reliable pattern is a **janeway-side listener**: a small local
+service holds a HA websocket connection (long-lived token), subscribes to `state_changed` for
+the `scene_003` entities, debounces on the timestamp, and shells out locally. Zero HA-config
+surgery; all logic on the machine you control. See skill:houseparty-buttons for the built one.
+
 ## When a new switch is added
 1. `python3 scripts/inovelli.py list` — confirm it appears (model VZW32-SN, alive).
    If it's not alive/interviewed, that's a physical/mesh problem — see the Node 16 saga in
