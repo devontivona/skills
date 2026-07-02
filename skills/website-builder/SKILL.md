@@ -97,7 +97,37 @@ button text before. Prefer scoping component classes to avoid ties (e.g. `.btn.b
 instead of bare `.btn--primary`) so a button's own styling always outranks an ambient link
 rule regardless of where either is declared.
 
+## 5c. Device-size check (mandatory, before you call it done)
+
+Simple responsive bugs — wrapped button text, an overflowing hero, a squashed nav — are easy
+to miss by eyeballing a desktop browser and are the fastest way a build reads as amateur.
+Always screenshot the hosted page at these three widths and actually look at them before
+handing off:
+
+```bash
+CHROME=$(find ~/.cache/puppeteer -name chrome -type f -executable | head -1)
+for w in 375 834 1440; do
+  "$CHROME" --headless --no-sandbox --disable-gpu \
+    --window-size=${w},1200 --screenshot=/tmp/check-${w}.png \
+    --run-all-compositor-stages-before-draw --virtual-time-budget=3000 \
+    "https://<your-devbox-url>"
+done
+```
+
+- **375px** — iPhone width. Check every button's text stays on one line, nav collapses
+  sensibly, hero text doesn't overflow its box.
+- **834px** — iPad Pro 11" portrait. The classic width for exposing a lost page-gutter (see
+  4b) or a two-column layout that hasn't collapsed yet.
+- **1440px** — a typical laptop width, to confirm the desktop layout still looks intentional
+  and content doesn't float oddly inside the max-width container.
+
+Look at the actual screenshots (send yourself a quick check or open the PNG) rather than just
+trusting the CSS — visually confirm no text wraps where it shouldn't, nothing overflows its
+container, and spacing still feels intentional at each size.
+
 ## 6. Iterate
+
+
 
 On feedback, edit index.html in place and let devbox reload. Keep it one self-contained file.
 
@@ -107,6 +137,7 @@ On feedback, edit index.html in place and let devbox reload. Keep it one self-co
   external assets you cannot produce.
 - Obey the chosen style's Do/Don'ts without exception.
 - Run the accessibility pass (step 5b) on the hosted URL and fix every issue before handing off — don't call a build done on eyeball-only contrast checks.
+- Screenshot and visually check 375px/834px/1440px widths (step 5c) before handing off — catch wrapped buttons and overflow by eye, not just by reading CSS.
 - Host via devbox, never an ad-hoc server.
 - This skill builds pages; it does not deploy to production or buy domains. Stop and ask if the
   request goes beyond building and previewing a page.

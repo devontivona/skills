@@ -1,17 +1,24 @@
 # Sunshine -- Style Reference
 > A loud, confident electric-yellow surface with near-black ink, flat hard-offset shadows, and a dual IBM Plex type system. Bright, graphic, and a little punk.
 
-**Theme:** light (high-chroma)
+**Theme:** light, high-craft, restrained
 
-Sunshine is the brightest style in the library. A single saturated electric yellow (#f0fb29)
-owns the page as the dominant surface -- not an accent, the background itself -- paired with
-near-black ink (#202020 / #333333) for maximum contrast. Depth comes only from flat,
-hard-offset shadows (no blur), which give cards and buttons a bold, printed, graphic-novel
-quality. Corners are nearly square (2px) everywhere -- there are no pills and no soft
-rounding. Type splits cleanly: IBM Plex Sans for all display and body, IBM Plex Mono for
-labels, tags, and code. A calm sky blue (#aee3fd) is the only secondary color, used for code
-surfaces and quiet highlights. Use Sunshine when the content should feel energetic, modern,
-and unafraid: launch pages, bold explainers, opinionated comparisons, playful microsites.
+Sunshine pairs a clean paper-white canvas with near-black ink (#202020 / #333333) for the
+bulk of the page, and treats a single saturated electric yellow (#f0fb29) as a **rare, high-impact
+accent** -- not the base surface. Think of yellow like a designer's one loud color: it shows up
+as a hero/header band, an occasional callout section, or a single small accent (a tag, an
+icon, an underline) -- never as the default background of ordinary content sections, and never
+more than one yellow element visible in a given viewport. This restraint is what separates
+Sunshine from an amateur "make it all yellow" pastiche -- see "Yellow usage discipline" below,
+it is the most important rule in this doc. Depth on cards comes from flat hard-offset shadows
+(no blur) for a bold, printed quality; buttons stay flat (no shadow -- see Buttons). Corners
+are nearly square (2px) everywhere -- there are no pills and no soft rounding. Type splits
+cleanly: IBM Plex Sans for all display and body, IBM Plex Mono for labels/tags/code, used
+sparingly (not as a decorative prefix on every heading -- see "Eyebrow labels" below). Light
+Phosphor icons add graphic clarity without clutter. A calm sky blue (#aee3fd) is the only
+secondary chromatic color, used for code surfaces and quiet highlights. Use Sunshine when the
+content should feel confident and modern but polished -- launch pages, opinionated explainers,
+comparisons, microsites -- like a professionally art-directed page, not a themed template.
 
 ## Fonts (self-contained HTML)
 
@@ -33,18 +40,47 @@ Both faces are on Google Fonts -- one `<link>`, no licensed fonts. Add to `<head
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Electric Yellow | `#f0fb29` | `--color-electric-yellow` | THE page surface -- dominant background behind hero and most sections |
-| Ink | `#202020` | `--color-ink` | Primary text, headings, button fill, and the shadow color |
-| Near Black | `#333333` | `--color-near-black` | Body text, nav links, secondary headings on yellow |
-| Paper White | `#ffffff` | `--color-paper-white` | Text on dark fills; card surface when yellow needs a rest |
-| Light Gray | `#f5f5f5` | `--color-light-gray` | Neutral card/section surface for calmer passages |
+| Paper White | `#ffffff` | `--color-paper-white` | THE default page surface -- body background for most sections |
+| Ink | `#202020` | `--color-ink` | Primary text, headings, borders, and the shadow color |
+| Near Black | `#333333` | `--color-near-black` | Secondary body text, nav links, muted labels |
+| Electric Yellow | `#f0fb29` | `--color-electric-yellow` | RARE accent -- a hero/header band, one callout section, or a single small tag/icon/underline. Never the default background of an ordinary content section. See "Yellow usage discipline." |
+| Light Gray | `#f5f5f5` | `--color-light-gray` | Neutral card/section surface for calmer passages -- this, not yellow, is the usual "alternate section" background |
 | Charcoal | `#202020` | `--color-charcoal` | Dark section backgrounds and dark CTA fills (same hue as ink) |
 | Border Gray | `#222222` | `--color-border-gray` | Hairline/solid borders on buttons, cards, inputs |
 | Sky Blue | `#aee3fd` | `--color-sky-blue` | Secondary accent only -- code surfaces, inline highlights, quiet callouts |
 
-Contrast rules: ink (#202020) or near-black (#333333) on electric yellow passes AA. On
+Contrast rules: ink (#202020) or near-black (#333333) on white/electric yellow passes AA. On
 charcoal/dark fills use paper white. Never put electric yellow text on white (fails contrast) --
-yellow is a surface, not a text color.
+yellow is a surface/accent, not a text color.
+
+## Yellow usage discipline (read this before building anything)
+
+This is the rule that most separates a professional Sunshine build from an amateur copy: **at
+most ONE element should carry electric yellow in any given viewport.** Overusing yellow as a
+backdrop is the single most common way this style goes wrong.
+
+**Where yellow IS allowed (pick one per screen, not all of them):**
+- A hero/header band at the very top of the page (the first thing a visitor sees).
+- One callout or CTA section elsewhere on the page (e.g. a single mid-page banner) -- but if
+  the hero already used yellow, prefer white/light-gray/charcoal for this instead of yellow again.
+- A single small accent inside an otherwise white/gray/charcoal layout: one tag, one icon
+  fill, one underline/highlight, one stat number. Small and singular, not a section fill.
+
+**Where yellow is NOT allowed:**
+- As the default page background (`body { background: ... }`) -- that reads as "we colored
+  the whole template yellow," not "we used yellow deliberately." Default the page background
+  to paper white or light gray.
+- As the background of more than one full-width section on the same page.
+- As the background of ordinary content sections: card grids, comparison tables, feature
+  lists, footers. Footers in particular should be a plain white/light-gray/charcoal band, NOT
+  yellow with a dot grid -- reserve the dot-grid texture for whichever ONE band (hero or CTA)
+  is already the yellow moment, so it doesn't fight for attention twice.
+- Stacked on an adjacent section that's ALSO yellow (immediate back-to-back yellow bands).
+
+If you find yourself reaching for `--color-electric-yellow` a third time on a page, stop --
+swap it for `--color-light-gray`, `--color-paper-white`, or `--color-charcoal` instead. Ask
+"if I removed every yellow element but one, which one would still make the page feel
+Sunshine?" -- keep only that one.
 
 ## Tokens -- Typography
 
@@ -238,22 +274,79 @@ mono title if you want it to read more like a text-file window. The dots stay ou
 (no colored traffic lights) to respect the two-color system. Round dots are the ONE allowed
 exception to the sharp-corner rule — they're an intentional retro motif, not a UI control.
 
+## Icons -- Phosphor, Light weight only
+
+Sunshine uses **Phosphor Icons, Light weight** (https://phosphoricons.com /
+https://github.com/phosphor-icons/homepage) for all iconography -- thin, precise line icons
+that match the mono/sans type contrast without adding visual noise. Never mix in a different
+icon set or weight (no filled/bold/duotone Phosphor icons in this style -- Light only).
+
+**How to include them in a self-contained HTML file (no build step):**
+
+Preferred -- inline SVG (fully self-contained, no external request, styleable with
+`currentColor` so it inherits ink/white automatically):
+```html
+<!-- Phosphor "coffee", Light weight, inlined -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" width="24" height="24" aria-hidden="true">
+  <path d="M82,56V24a6,6,0,0,1,12,0V56a6,6,0,0,1-12,0Zm38,6a6,6,0,0,0,6-6V24a6,6,0,0,0-12,0V56A6,6,0,0,0,120,62Zm32,0a6,6,0,0,0,6-6V24a6,6,0,0,0-12,0V56A6,6,0,0,0,152,62Zm94,58v8a38,38,0,0,1-36.94,38,94.55,94.55,0,0,1-31.13,44H208a6,6,0,0,1,0,12H32a6,6,0,0,1,0-12H62.07A94.34,94.34,0,0,1,26,136V88a6,6,0,0,1,6-6H208A38,38,0,0,1,246,120Zm-44,16V94H38v42a82.27,82.27,0,0,0,46.67,74h70.66A82.27,82.27,0,0,0,202,136Zm32-16a26,26,0,0,0-20-25.29V136a93.18,93.18,0,0,1-1.69,17.64A26,26,0,0,0,234,128Z"/>
+</svg>
+```
+Fetch any icon's raw path data from the Phosphor core repo at build time:
+`https://unpkg.com/@phosphor-icons/core@2/assets/light/<icon-name>-light.svg` (e.g.
+`gauge-light.svg`, `drop-light.svg`, `check-circle-light.svg`) -- copy the `<path>` contents
+into an inline `<svg viewBox="0 0 256 256" fill="currentColor">` in your page. A handful of
+common ones are cached in this skill's `assets/icons/` folder for quick reuse.
+
+Alternative -- icon font via CDN link (simpler markup, one extra network request, fine for a
+quick draft): add to `<head>`:
+```html
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css" />
+```
+then use `<i class="ph-light ph-coffee"></i>` anywhere. Prefer inline SVG for anything meant
+to last or go fully offline-capable; the font link is fine for a fast preview.
+
+**Sizing & color:** default to 20-24px for inline-with-text icons, 32-40px for a standalone
+feature icon. Icons inherit `color` via `fill="currentColor"` -- so an icon in ink text is
+ink, an icon on a charcoal band is paper white, matching whatever text color surrounds it.
+Never recolor an icon electric yellow as a fill (contrast/legibility); yellow icons are fine
+only as a small stroke/accent on an already-yellow band.
+
+**Where to use icons:** a small icon beside a stat/feature label, a check/x in a comparison
+list, a light bulb/gauge/etc next to a callout, nav or footer link icons, a single hero icon
+next to the eyebrow. Use them to add clarity (what kind of thing is this row/section) not
+as pure decoration on every line -- a page with an icon on literally everything reads as
+noisy as a page with none.
+
 ## Components
 
-### Primary Button (sharp, hard shadow)
+### Primary Button (sharp, flat -- NO hard-offset shadow)
 Fill `--color-ink`, text `--color-paper-white`, `border-radius: 2px`, border `1px solid #202020`,
-padding `12px 20px`, `--font-mono` 14px/500, **`text-transform: uppercase`**,
-`box-shadow: var(--shadow-hard-sm)`. Hover: `transform: translate(4px,4px); box-shadow: none;`
-(the "press"). NEVER pill-shaped.
+padding `12px 20px`, `--font-mono` 14px/500, **`text-transform: uppercase`**. **No box-shadow.**
+Hover: darken/lighten the fill slightly (e.g. `filter: brightness(1.15)`) or invert to an
+outline -- do NOT use the hard-offset "press" shadow on buttons; that's reserved for cards and
+the retro window (see "Where hard shadows go" below). NEVER pill-shaped.
 
 ### Secondary Button (outline)
 Background transparent or `--color-paper-white`, text `--color-ink`, `border-radius: 2px`,
-border `1px solid #222222`, same padding + mono label, **uppercase**. Optional hard-sm shadow.
-Sharp corners.
+border `1px solid #222222`, same padding + mono label, **uppercase**. No shadow. Sharp corners.
 
 All button labels are UPPERCASE (the mono label, letter-spacing, and all-caps together are
 what make the button read as a mono "control" rather than a link) -- put `text-transform:
 uppercase` on the shared `.btn` base rule so every variant inherits it.
+
+**Never let button text wrap.** Buttons must render on one line at every viewport width down
+to a 375px phone. Set `white-space: nowrap` on `.btn`, keep labels short (2-4 words), and if a
+button sits in a flex row that could get tight (e.g. a nav bar), give the row `flex-wrap: wrap`
+on the CONTAINER (so buttons drop to a new row as a whole) rather than letting text wrap
+inside a single button. Verify this by hand at 375px and 768px widths (see the mandatory
+device-size check in SKILL.md) -- wrapped button text is one of the most common and most
+amateur-looking responsive bugs.
+
+**Where hard shadows go:** the flat 8px/4px hard-offset shadow (`--shadow-hard-lg` /
+`--shadow-hard-sm`) is a CARD and retro-window signature, not a button one. Putting it on
+every button is a big part of why an earlier pass of this style felt like a busy knockoff --
+reserve it for the handful of elevated surfaces (cards, stat blocks, the retro window, the
+footer panel), and keep buttons flat so the shadow still means something when it appears.
 
 **Specificity gotcha:** give button-variant classes a compound selector, e.g.
 `.btn.btn--primary` / `.btn.btn--secondary`, not a bare `.btn--primary`. A generic ambient
@@ -280,6 +373,13 @@ title) over a 24-32px padded body. Use at most one or two per page — it is a s
 `--font-mono` 12-14px/500, letter-spacing 0.5px, uppercase optional. As a tag: 2px radius,
 1px solid border, 2-8px padding. Great sitting above an h2/h3 to label a section.
 
+**Don't prefix every eyebrow with `//`.** A leading `//` (or any single repeated glyph) reads
+as a designer's one signature flourish the first time and a tic by the fifth -- overusing it is
+one of the fastest ways this style reads like an amateur copy rather than an original hand. Use
+it sparingly (at most once or twice on a page, e.g. a single "// nerd corner" aside), and let
+most eyebrows just be a plain uppercase mono label with no punctuation prefix (`SECTION NAME`,
+not `// Section Name`).
+
 ### Code / Highlight Surface
 Background `--color-sky-blue`, ink text, `--font-mono` 16px, 2px radius, 16-24px padding. The
 only place sky blue leads. Also usable for a quiet inline highlight (sky-blue background behind
@@ -296,51 +396,72 @@ beneath. Optionally one such band sits on the dot grid.
 ## Do's and Don'ts
 
 ### Do
-- Let electric yellow be the dominant surface -- it is the background, not an accent.
+- Default the page to paper white / light gray; treat electric yellow as a rare, single-use
+  accent (hero OR one callout OR one small tag/icon -- see "Yellow usage discipline").
 - Keep ALL corners at 2px (max 8px for large media). Sharp is the identity.
-- Use only flat hard-offset shadows (solid ink, 0 blur). Let buttons "press" on hover.
+- Use flat hard-offset shadows (solid ink, 0 blur) on CARDS and the retro window only --
+  never on buttons, which stay flat with no shadow.
 - Pair IBM Plex Sans (display/body) with IBM Plex Mono (labels/tags/code) -- lean on that contrast.
-- Set every button label to uppercase (`text-transform: uppercase` on the shared `.btn` base).
+- Set every button label to uppercase (`text-transform: uppercase` on the shared `.btn` base)
+  and never let button text wrap (`white-space: nowrap`; verify at 375px).
 - Keep borders 1px by default; reserve 2px only for major band-to-band section dividers and a table's header rule.
 - Apply heavy negative letter-spacing to large headings (-2px to -6px) for the confident look.
-- Reserve the dot grid for the footer plus at most one other band; keep dots small and low-contrast (~1px dot / ~17px spacing default).
+- Reserve the dot grid for whichever single band is already carrying yellow (hero or CTA, not
+  both, and not the footer by default -- see "Yellow usage discipline"); keep dots small and
+  low-contrast (~1px dot / ~17px spacing default).
 - Keep sky blue secondary -- code surfaces and quiet highlights only.
+- Use Phosphor Light-weight icons to add clarity at a glance (stats, comparison checks,
+  callouts) -- see "Icons" section.
+- Check every build on iPhone (375px) and iPad (834px/1194px) widths before calling it done
+  (see SKILL.md's device-size check) -- catches wrapped buttons and other responsive bugs.
 
 ### Don't
 - NEVER use pills or fully rounded controls, and never radii between 2px and 8px -- no soft
   "friendly" rounding. Sunshine is sharp.
 - Never use soft/blurred shadows (any blur or spread > 0) -- the shadow vocabulary is flat offset only.
-- Never set electric yellow as a text color, and never put ink/near-black text on a busy dot
-  grid without a solid panel behind it.
-- Don't overuse the dot grid (no more than ~2 sections, never adjacent, never behind body text/tables).
+- Never put a hard-offset shadow on a button -- that's a card/retro-window signature only.
+- Never set electric yellow as the default page/section background, never use it on more than
+  one element per viewport, and never put ink/near-black text on a busy dot grid without a
+  solid panel behind it.
+- Don't overuse the dot grid (at most the one band that's already yellow; never adjacent
+  sections; never behind body text/tables).
 - Don't introduce a third chromatic color -- the system is yellow + ink + one sky blue.
 - Don't render display or body text in the mono face (mono is for labels/tags/code), and don't
   set headings below weight 500.
+- Don't prefix every eyebrow/label with `//` -- use it once or twice at most, not as a
+  running tic on every heading.
+- Don't mix icon sets or weights -- Phosphor Light only, and don't decorate every single line
+  with one; use icons where they add meaning.
 
 ## Surfaces
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 1 | Yellow Surface | `#f0fb29` | The dominant page background |
-| 2 | Paper Card | `#ffffff` | Cards/containers that sit on yellow (with hard ink shadow) |
-| 3 | Neutral | `#f5f5f5` | Calmer section/card surface when yellow needs a rest |
+| 1 | Paper White | `#ffffff` | THE default page background for most sections |
+| 2 | Neutral | `#f5f5f5` | The usual "alternate section" background (not yellow) |
+| 3 | Yellow Accent | `#f0fb29` | RARE: one hero/header band, or one callout, or a single small tag/icon -- never more than one per viewport |
 | 4 | Charcoal | `#202020` | Dark sections / dark CTA fills (paper-white text) |
-| — | Border | `#202020` / `#222222` | Solid 2px borders and the shadow color |
+| — | Border | `#202020` / `#222222` | Solid 1px borders (2px reserved for major dividers) and the shadow color |
 | — | Sky | `#aee3fd` | Secondary: code surfaces + quiet highlights |
 
 ## Imagery
 Prefer bold, graphic visuals: high-contrast product shots on white cards (2px radius, hard
-shadow), simple line icons in ink (mono stroke, never multicolor), and the dot grid as texture.
-Keep image density moderate -- type and color do the heavy lifting. No soft drop shadows on
-images; if an image needs elevation, give it the flat hard-offset shadow like a card.
+shadow), Phosphor Light-weight icons in ink (never multicolor, never mixed weights), and the
+dot grid as texture on whichever single band is already the yellow moment. Keep image density
+moderate -- type and color do the heavy lifting. No soft drop shadows on images; if an image
+needs elevation, give it the flat hard-offset shadow like a card.
 
 ## Layout
-Max-width ~1200px on the electric-yellow canvas. Sticky top nav: wordmark left (Sans 600 or
-mono label), nav links (mono 14px), a sharp primary button right. Hero is oversized Sans 500
-with heavy negative tracking, left-aligned or split 50/50 with a card/visual; a sharp primary +
-outline secondary button pair beneath. Sections alternate yellow, white-card clusters, and the
-occasional charcoal band. Footer is the dot grid (ink dots on yellow, or light dots on
-charcoal) with mono labels. Generous 64-96px section rhythm.
+Max-width ~1200px on a paper-white canvas (yellow only where the "Yellow usage discipline"
+section allows it -- typically the hero). Sticky top nav: wordmark left (Sans 600 or mono
+label), nav links (mono 14px), a sharp primary button right (flat, no shadow, `white-space:
+nowrap`). Hero is oversized Sans 500 with heavy negative tracking, left-aligned or split 50/50
+with a card/visual; a sharp primary + outline secondary button pair beneath (never let button
+labels wrap). Sections alternate white and light-gray card clusters, with the occasional
+charcoal band -- yellow appears at most once more on the page, in a single callout. Footer is
+a plain white/light-gray/charcoal band with mono labels -- NOT yellow with a dot grid by
+default (only make the footer the dot-grid band if nothing else on the page already used
+yellow). Generous 64-96px section rhythm.
 
 ## Quick Start -- CSS Custom Properties
 
