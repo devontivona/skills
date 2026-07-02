@@ -19,6 +19,17 @@ lives in code here. (See topic:home-assistant for the general cross-machine note
 skill:inovelli-switches for the scene-button mapping: scene_001=off paddle, 002=on paddle,
 **003=config button**.)
 
+## Runtime design (v2 — non-blocking + warm group)
+The receive loop must NEVER block on houseparty. Button presses are pushed to an
+asyncio.Queue; a single worker runs one houseparty action at a time. (v1 ran the CLI
+inline and froze the websocket for the ~25s a cold 7-speaker group-form takes, so it
+missed the next press and could stall.) Two more tricks:
+- **Warm group:** toggle uses pause/resume (never stop), so repeat presses are ~1s
+  instead of re-forming the group (~25s cold). `stop` is avoided while in use.
+- **Two-stage play:** start on `primary_speaker` (~1.5s, instant feedback) then fan out
+  to all speakers in the background. state.json tracks mode = idle/playing/paused so
+  toggle knows whether to play / resume / pause.
+
 ## Where everything lives (janeway)
 - Code + config: `~/projects/houseparty-buttons/`
   - `listener.py` — the websocket listener + button dispatch
@@ -38,6 +49,7 @@ skill:inovelli-switches for the scene-button mapping: scene_001=off paddle, 002=
   "houseparty_bin": "/home/tivona/.local/bin/houseparty",
   "all_speakers": ["Bathroom Speaker","Bedroom Speaker","Kitchen Speaker","Living Room","Office","Rec Room","Sonos Move"],
   "volume": 10,
+  "primary_speaker": "Kitchen Speaker",
   "buttons": {
     "event.kitchen_mmwave_dimmer_scene_003":   {"label":"Kitchen Pendant config button","gesture":"KeyPressed","action":"toggle","mixtape":"poolside"},
     "event.kitchen_mmwave_dimmer_scene_003_2": {"label":"Kitchen Cabinet config button","gesture":"KeyPressed","action":"cycle","mixtapes":["poolside","slow-focus","4-to-the-floor","island-time","feelings","memory-lane","100-percent-hip-hop"]}
