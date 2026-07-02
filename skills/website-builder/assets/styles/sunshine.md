@@ -134,21 +134,23 @@ per page.
 /* Ink dots on the electric-yellow surface (footer/CTA default) */
 .dot-grid {
   background-color: var(--color-electric-yellow);
-  background-image: radial-gradient(circle, rgba(32,32,32,0.28) 1.5px, transparent 1.6px);
-  background-size: 24px 24px;      /* dot spacing; 16-32px reads well */
+  background-image: radial-gradient(circle, rgba(32,32,32,0.28) 1px, transparent 1.1px);
+  background-size: 17px 17px;      /* dot spacing; 12-20px reads well -- keep it fine, not chunky */
   background-position: 0 0;
 }
 /* Dots on a dark section: light dots on charcoal */
 .dot-grid--dark {
   background-color: var(--color-charcoal);
-  background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1.5px, transparent 1.6px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1.1px);
+  background-size: 17px 17px;
 }
 /* Keep text legible: lay content over a solid inset panel when needed */
 .dot-grid .panel { background: var(--color-electric-yellow); }
 ```
-Tune `background-size` for density (bigger = sparser) and the alpha for subtlety. Keep dots
-low-contrast so foreground type stays dominant.
+Tune `background-size` for density (bigger = sparser) and the alpha for subtlety. Keep the
+dots small and tight (~1px dot, ~17px spacing is the default) -- a larger/looser grid reads
+chunky and fights the fine engineering-paper texture that makes this signature work. Keep
+dots low-contrast so foreground type stays dominant.
 
 ## The Retro Window Card (signature framed figure) — use for a single focal detail
 
@@ -222,12 +224,27 @@ exception to the sharp-corner rule — they're an intentional retro motif, not a
 
 ### Primary Button (sharp, hard shadow)
 Fill `--color-ink`, text `--color-paper-white`, `border-radius: 2px`, border `2px solid #202020`,
-padding `12px 20px`, `--font-mono` 14px/500, `box-shadow: var(--shadow-hard-sm)`. Hover:
-`transform: translate(4px,4px); box-shadow: none;` (the "press"). NEVER pill-shaped.
+padding `12px 20px`, `--font-mono` 14px/500, **`text-transform: uppercase`**,
+`box-shadow: var(--shadow-hard-sm)`. Hover: `transform: translate(4px,4px); box-shadow: none;`
+(the "press"). NEVER pill-shaped.
 
 ### Secondary Button (outline)
 Background transparent or `--color-paper-white`, text `--color-ink`, `border-radius: 2px`,
-border `2px solid #222222`, same padding + mono label. Optional hard-sm shadow. Sharp corners.
+border `2px solid #222222`, same padding + mono label, **uppercase**. Optional hard-sm shadow.
+Sharp corners.
+
+All button labels are UPPERCASE (the mono label, letter-spacing, and all-caps together are
+what make the button read as a mono "control" rather than a link) -- put `text-transform:
+uppercase` on the shared `.btn` base rule so every variant inherits it.
+
+**Specificity gotcha:** give button-variant classes a compound selector, e.g.
+`.btn.btn--primary` / `.btn.btn--secondary`, not a bare `.btn--primary`. A generic ambient
+rule elsewhere (e.g. `.nav a { color: ... }`) can have equal CSS specificity to a bare
+`.btn--primary`, and equal-specificity rules resolve by source order -- whichever is
+declared later in the stylesheet silently wins, which can leave a button with the wrong
+text color (e.g. invisible dark-on-dark text) even though the button's own rule looks
+correct in isolation. Compounding the selector guarantees the button's own styling always
+wins regardless of where either rule sits in the file.
 
 ### Card
 Background `--color-paper-white` (or `--color-light-gray`), `border-radius: 2px`, border
@@ -264,8 +281,9 @@ beneath. Optionally one such band sits on the dot grid.
 - Keep ALL corners at 2px (max 8px for large media). Sharp is the identity.
 - Use only flat hard-offset shadows (solid ink, 0 blur). Let buttons "press" on hover.
 - Pair IBM Plex Sans (display/body) with IBM Plex Mono (labels/tags/code) -- lean on that contrast.
+- Set every button label to uppercase (`text-transform: uppercase` on the shared `.btn` base).
 - Apply heavy negative letter-spacing to large headings (-2px to -6px) for the confident look.
-- Reserve the dot grid for the footer plus at most one other band; keep dots low-contrast.
+- Reserve the dot grid for the footer plus at most one other band; keep dots small and low-contrast (~1px dot / ~17px spacing default).
 - Keep sky blue secondary -- code surfaces and quiet highlights only.
 
 ### Don't

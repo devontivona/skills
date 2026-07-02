@@ -46,6 +46,37 @@ Load the devbox skill and use it to serve the site's folder and get a shareable 
 the supported way to run/host/share a local project — do not hand-roll a server. Send the owner
 the URL (send_message).
 
+## 5b. Accessibility pass (mandatory, before you call it done)
+
+CSS specificity bugs are easy to introduce (e.g. a later, equally-specific selector silently
+overriding a button's text/background pairing) and easy to miss by eye. Always run an
+automated contrast/accessibility check on the hosted URL before handing off:
+
+```bash
+npx --yes puppeteer browsers install chrome   # one-time, if Chrome isn't already cached
+npx --yes pa11y https://<your-devbox-url>
+```
+
+`pa11y` drives headless Chrome against the live page and checks WCAG2AA rules (contrast,
+alt text, labels, landmarks, etc.) using axe/HTML_CodeSniffer under the hood — no account,
+no config needed for a quick pass. Exit code 0 + "0 issues" means clean; anything reported
+includes the failing selector, the actual contrast ratio, and a fix suggestion (e.g. "change
+text colour to #fff"). Fix every issue it reports, then re-run until clean.
+
+If `pa11y` can't find Chrome, install it once with
+`npx --yes puppeteer browsers install chrome` — it caches under `~/.cache/puppeteer` and
+subsequent runs are fast. If Chrome fails to launch in a sandboxed environment, pass a config
+file: `pa11y <url> --config pa11y-config.json` with
+`{"chromeLaunchConfig": {"args": ["--no-sandbox", "--disable-setuid-sandbox"]}}`.
+
+Common root cause worth knowing: two CSS rules with equal specificity targeting the same
+element (e.g. a generic `.nav__links a` link-color rule and a `.btn--primary` button-color
+rule) resolve by **source order**, not intent — whichever is declared later in the
+stylesheet wins, even on an element matching both. This silently created black-on-black
+button text before. Prefer scoping component classes to avoid ties (e.g. `.btn.btn--primary`
+instead of bare `.btn--primary`) so a button's own styling always outranks an ambient link
+rule regardless of where either is declared.
+
 ## 6. Iterate
 
 On feedback, edit index.html in place and let devbox reload. Keep it one self-contained file.
@@ -55,6 +86,7 @@ On feedback, edit index.html in place and let devbox reload. Keep it one self-co
 - One self-contained HTML file: inlined CSS, a Google-Fonts <link>, no build, no framework, no
   external assets you cannot produce.
 - Obey the chosen style's Do/Don'ts without exception.
+- Run the accessibility pass (step 5b) on the hosted URL and fix every issue before handing off — don't call a build done on eyeball-only contrast checks.
 - Host via devbox, never an ad-hoc server.
 - This skill builds pages; it does not deploy to production or buy domains. Stop and ask if the
   request goes beyond building and previewing a page.
