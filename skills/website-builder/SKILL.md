@@ -46,6 +46,26 @@ Load the devbox skill and use it to serve the site's folder and get a shareable 
 the supported way to run/host/share a local project — do not hand-roll a server. Send the owner
 the URL (send_message).
 
+## 4b. The page-gutter class (prevent edge-to-edge sections)
+
+Every build should have one shared "wrap" class that centers content and applies the page's
+side margin, e.g.:
+
+```css
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+```
+
+Apply it to the inner container of **every** section, including the footer — never let a
+section's content sit directly in the full-bleed section element. The classic bug: a section
+needs its own vertical rhythm (e.g. `.footer__inner { padding: 64px 0; }`) and that inner class
+is combined on the SAME element as `.wrap` (`<div class="wrap footer__inner">`). If the second
+class uses the **padding shorthand**, it resets all four sides and silently zeroes out wrap's
+left/right gutter — the content goes edge-to-edge (invisible on desktop, obvious on a tablet
+where the section is narrower than max-width). Avoid it: when a class shares an element with
+`.wrap`, only ever set `padding-top`/`padding-bottom` on it, never the `padding` shorthand.
+Check every section at a mid-width viewport (e.g. 834px, iPad Pro 11" portrait) before calling
+a build done — that's the width most likely to expose a lost gutter.
+
 ## 5b. Accessibility pass (mandatory, before you call it done)
 
 CSS specificity bugs are easy to introduce (e.g. a later, equally-specific selector silently

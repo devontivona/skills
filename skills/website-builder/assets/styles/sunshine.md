@@ -96,6 +96,24 @@ tokens `--space-0` … `--space-96`.
 There are NO pills and NO fully round controls in Sunshine. Everything is 2px; only large
 image/media panels may use 8px. This is a hard rule -- see Don'ts.
 
+### Borders -- 1px by default, 2px reserved for major dividers
+
+Default every border to **1px solid ink/border-gray** -- buttons, cards, tags, inputs, the
+retro window's frame, table containers. A page where every outline is 2px reads busy and
+cartoonish; keep the outline weight quiet so the flat hard-offset shadows (below) do the work
+of standing things out.
+
+Reserve **2px** for genuine major horizontal dividers only:
+- Band-to-band seams between full-width sections (e.g. where a dot-grid stats band or a dark
+  CTA band meets the surface above/below it).
+- A table's header bottom-border (the line under `<thead>`), because it's the one rule
+  separating "column labels" from "all data."
+
+Do not use 2px for: button/card/tag/input outlines, in-card dividers (e.g. a spec list's
+top rule), or a sticky nav's bottom border -- those should be 1px. If in doubt, default to
+1px and only go to 2px when the line is doing real structural work (separating whole page
+regions), not decorating a component.
+
 ### Shadows -- flat, hard-offset, zero blur
 
 | Name | Value | Token |
@@ -223,14 +241,14 @@ exception to the sharp-corner rule — they're an intentional retro motif, not a
 ## Components
 
 ### Primary Button (sharp, hard shadow)
-Fill `--color-ink`, text `--color-paper-white`, `border-radius: 2px`, border `2px solid #202020`,
+Fill `--color-ink`, text `--color-paper-white`, `border-radius: 2px`, border `1px solid #202020`,
 padding `12px 20px`, `--font-mono` 14px/500, **`text-transform: uppercase`**,
 `box-shadow: var(--shadow-hard-sm)`. Hover: `transform: translate(4px,4px); box-shadow: none;`
 (the "press"). NEVER pill-shaped.
 
 ### Secondary Button (outline)
 Background transparent or `--color-paper-white`, text `--color-ink`, `border-radius: 2px`,
-border `2px solid #222222`, same padding + mono label, **uppercase**. Optional hard-sm shadow.
+border `1px solid #222222`, same padding + mono label, **uppercase**. Optional hard-sm shadow.
 Sharp corners.
 
 All button labels are UPPERCASE (the mono label, letter-spacing, and all-caps together are
@@ -248,8 +266,9 @@ wins regardless of where either rule sits in the file.
 
 ### Card
 Background `--color-paper-white` (or `--color-light-gray`), `border-radius: 2px`, border
-`2px solid #202020`, `box-shadow: var(--shadow-hard-lg)`, padding 24-32px. On an electric-yellow
-section a white card with a hard ink shadow is the workhorse container.
+`1px solid #202020`, `box-shadow: var(--shadow-hard-lg)`, padding 24-32px. On an electric-yellow
+section a white card with a hard ink shadow is the workhorse container. (The shadow, not the
+border, is what should read as bold -- keep the outline a quiet 1px.)
 
 ### Retro Window Card
 **Role:** A single framed focal figure — highlight photo, diagram, screenshot, or a set-apart
@@ -259,7 +278,7 @@ title) over a 24-32px padded body. Use at most one or two per page — it is a s
 
 ### Eyebrow Label / Tag
 `--font-mono` 12-14px/500, letter-spacing 0.5px, uppercase optional. As a tag: 2px radius,
-2px solid border, 2-8px padding. Great sitting above an h2/h3 to label a section.
+1px solid border, 2-8px padding. Great sitting above an h2/h3 to label a section.
 
 ### Code / Highlight Surface
 Background `--color-sky-blue`, ink text, `--font-mono` 16px, 2px radius, 16-24px padding. The
@@ -267,7 +286,7 @@ only place sky blue leads. Also usable for a quiet inline highlight (sky-blue ba
 a word).
 
 ### Input
-Background `--color-paper-white`, `border-radius: 2px`, border `2px solid #222222`, padding
+Background `--color-paper-white`, `border-radius: 2px`, border `1px solid #222222`, padding
 `12px 16px`, ink text, `--font-sans` 16px. Sharp, like everything else.
 
 ### Stat / Feature Block
@@ -282,6 +301,7 @@ beneath. Optionally one such band sits on the dot grid.
 - Use only flat hard-offset shadows (solid ink, 0 blur). Let buttons "press" on hover.
 - Pair IBM Plex Sans (display/body) with IBM Plex Mono (labels/tags/code) -- lean on that contrast.
 - Set every button label to uppercase (`text-transform: uppercase` on the shared `.btn` base).
+- Keep borders 1px by default; reserve 2px only for major band-to-band section dividers and a table's header rule.
 - Apply heavy negative letter-spacing to large headings (-2px to -6px) for the confident look.
 - Reserve the dot grid for the footer plus at most one other band; keep dots small and low-contrast (~1px dot / ~17px spacing default).
 - Keep sky blue secondary -- code surfaces and quiet highlights only.
