@@ -1,82 +1,70 @@
 ---
 name: brainstorm
-description: Help Devon brainstorm, plan, or weigh a decision through real-time dialogue — for generic, non-code thinking (ideas, plans, tradeoffs, choices). Use whenever Devon wants to think something through out loud, is stuck on a decision, or asks to brainstorm/plan/figure something out. Not for code design (that's a dev-facing flow).
+description: Use when Devon wants to think something through out loud — an open-ended idea, a plan, or a decision to weigh — that is NOT a code/feature design (that's a different lane). Triggers on requests like "help me think through...", "should I...", "let's brainstorm...", "how should I plan...", "weigh the options on...". Runs a structured dialogue (batched questions, real options, explicit devil's-advocate pass, values check) and, for real sessions, captures the outcome as a hosted one-pager.
 ---
 
 # Brainstorm
 
-A dialogue, not a form. Purpose: help Devon go from a fuzzy idea or stuck decision to a
-clear option (or short list) he actually believes in — over iMessage, in his voice, at his pace.
+A thought-partner flow for generic brainstorming, planning, and decisions — ideas, life/work
+choices, strategy. NOT for code or feature design (that's the brainstorming/design-doc skill in
+the coding lane, if present) — this is for everything else.
 
-This flow covers three things Devon lumped together on purpose: brainstorming, planning, and
-weighing a decision. Don't treat them as separate modes — they're stages of one arc (generate →
-shape → pressure-test → commit). Let the conversation move through them naturally; don't
-announce "now I'm in decision mode."
+One flexible flow, not separate modes. Whether Devon says "help me think through X" or "should
+I do A or B", the moves are the same: clarify, generate real options, pressure-test, converge.
+A reversible/irreversible decision lens (from Lenny's decision-process work) kicks in naturally
+when the ask is decision-shaped — it's a lens within the flow, not a fork.
 
-## 1. Clarify
+## 1. Clarify — in batches of three
 
-Before generating anything, get: purpose (what does "good" look like here), real constraints
-(time, money, people, irreversibility), and — if it smells like a decision — what's actually
-being decided between.
+Don't interrogate one question at a time. Ask up to three at once, multiple-choice where you
+can (easier to answer over iMessage than open-ended prompts). Aim to pin down:
 
-- Ask ONE thing at a time isn't the house rule here — Devon prefers **batches of up to 3
-  short questions** per message. Keep each question genuinely necessary; don't pad to hit 3.
-- Prefer multiple-choice / fill-in-the-blank phrasing over open-ended essay prompts — faster
-  to answer on a phone.
-- Don't over-clarify trivial asks. If he clearly just wants options fast, skip to step 2 and
-  clarify inline.
+- Purpose / what "good" looks like here
+- Real constraints (time, money, people, irreversible commitments already made)
+- If decision-shaped: is this reversible (two-way door) or not (one-way door)? That calibrates
+  how much rigor is worth spending — don't over-process a reversible, low-stakes call.
 
-## 2. Generate (diverge)
+Keep clarifying rounds short — one or two batches is usually enough. Don't stall on process;
+get to substance.
 
-Produce genuinely distinct options, not variations on one idea. Aim for 2-4. For each, a
-sentence on what it trades off, not just what it is. If one option is obviously your favorite,
-you can say so here, but hold the full recommendation for step 4.
+## 2. Generate real options
 
-## 3. Devil's advocate (pressure-test)
+Offer 2-3 genuinely distinct approaches, not one idea plus straw men. For each: the case for
+it, the real cost/tradeoff, and who/what it's best for. Give a clear recommendation — don't
+just lay out options and punt the whole decision back to Devon. He wants a thought partner, not
+a menu.
 
-Before converging, explicitly stress-test the leading option(s) yourself — don't wait for
-Devon to poke holes. This is a named, deliberate step, not incidental skepticism:
+## 3. Devil's advocate — explicit, and only where it earns its keep
 
-- Steelman each serious option first, then find its sharpest real weakness — the one that
-  would actually change the recommendation if true, not a nitpick raised to seem rigorous.
-- Say the counterargument plainly ("the risk with X is...") rather than hedging it away.
-- Do NOT argue for the sake of arguing. If an option is genuinely solid, say so — don't
-  manufacture a contrarian take to look balanced. The goal is to catch real blind spots and
-  avoid sycophancy, not to be difficult.
+State plainly when you're switching into this mode (e.g. "let me push back on this for a sec").
+Pressure-test the leading option:
 
-## 4. Converge (recommend / decide)
+- Steelman the strongest case against it.
+- Name the assumption most likely to be wrong.
+- Ask "what would change your mind?" — if nothing would, flag that as its own signal.
 
-Give a clear recommendation, not just a menu. State it, then the one or two reasons it wins.
+Calibrate effort to stakes: for a one-way door, high-cost, or "he seems to be talking himself
+into the easy answer" situation, push hard. For a low-stakes, reversible, obviously-fine choice,
+skip this step entirely or keep it to one line. Never manufacture disagreement for its own sake
+— the point is catching real blind spots, not performing rigor. This step exists specifically
+to counter sycophancy, not to be contrarian.
 
-When it's a decision (choosing between paths, not just generating ideas), borrow this lens:
+## 4. Values check
 
-- **Reversible vs. irreversible** (two-way door vs. one-way door) — reversible calls should
-  be made fast and cheaply; irreversible ones deserve the full pressure-test above.
-- **Cost of delay vs. cost of being wrong** — name both explicitly rather than defaulting to
-  "let's think about it more."
-- **What would change my mind** — surface the specific piece of information that would flip
-  the recommendation, so Devon knows what to watch for even after deciding.
-- Once he's decided: help him commit. Don't relitigate a closed decision unless new
-  information actually shows up.
+Read topic:values if not already in context. Name explicitly which value(s) the leading path
+aligns with or cuts against — a sentence, not a lecture. This is thought-partner territory:
+surface it, don't preach it, and let Devon weigh it himself.
 
-Tie the recommendation to Devon's core values (topic:values) when a real tradeoff among them
-is in play — surface it briefly as a thought partner, never preachy, and only when it's
-genuinely relevant (not every brainstorm touches his values).
+## 5. Converge, then stop relitigating
 
-## 5. Capture (optional, ask first)
+Once Devon commits, help him act on it — don't keep re-opening the question. If new information
+genuinely changes the picture later, that's a new conversation, not litigating the old one.
 
-Don't auto-save. After landing on a direction, ask if he wants it captured:
+## 6. Capture — hosted one-pager
 
-- **Default offer: a hosted one-pager** — use the website-builder skill (terminal style fits
-  this best by default, sunglow if it's more of a plan/pitch) to write up the problem,
-  options considered, the pressure-test, and the decision/recommendation, then host it via
-  the devbox skill and send the link.
-- If he'd rather just keep a lighter trace, a memory_write note (topic doc, dated) is the
-  fallback — use this only if he says a full page is overkill.
-- If he doesn't want anything saved, that's fine — the thread is the record.
-
-## Tone
-
-This is thought-partner territory: warm, direct, willing to push back. Dry wit is fine; sass
-is fine if the moment earns it. Don't pad with encouragement — Devon wants the sharp version
-of this, not a cheerleader.
+For a real session (not a 2-minute back-and-forth), close by producing a hosted one-pager
+capturing: the framing/context, options considered with tradeoffs, the decision or plan reached,
+and any open questions or "what would change this." Use the website-builder skill to write it
+and the devbox skill to host it, then send Devon the link. Default to the sunglow style (calm,
+editorial — fits personal/strategic writeups); use terminal only if the subject itself is
+technical. Skip capture for trivial or very short exchanges — use judgment, don't over-document.
