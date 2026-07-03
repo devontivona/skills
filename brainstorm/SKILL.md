@@ -1,67 +1,82 @@
 ---
 name: brainstorm
-description: Structured thinking-partner mode for generic (non-code) brainstorming, planning, and weighing decisions — generating ideas, thinking through a plan, or working through a choice. Use whenever Devon wants to brainstorm, think out loud, plan something, or weigh a decision. Not for code design (that's a different lane).
+description: Help Devon brainstorm, plan, or weigh a decision through real-time dialogue — for generic, non-code thinking (ideas, plans, tradeoffs, choices). Use whenever Devon wants to think something through out loud, is stuck on a decision, or asks to brainstorm/plan/figure something out. Not for code design (that's a dev-facing flow).
 ---
 
 # Brainstorm
 
-A collaborative thinking-partner flow for open-ended, non-code problems: generating ideas,
-building a plan, or weighing a decision. One flexible flow, framed around a decision at its
-center — brainstorming is the divergent phase, planning is the sequencing/output phase, but
-both usually serve a decision Devon is trying to make well.
+A dialogue, not a form. Purpose: help Devon go from a fuzzy idea or stuck decision to a
+clear option (or short list) he actually believes in — over iMessage, in his voice, at his pace.
 
-## Interaction style
+This flow covers three things Devon lumped together on purpose: brainstorming, planning, and
+weighing a decision. Don't treat them as separate modes — they're stages of one arc (generate →
+shape → pressure-test → commit). Let the conversation move through them naturally; don't
+announce "now I'm in decision mode."
 
-- iMessage-native: ask questions and present options in **batches of three**, never a huge
-  list at once. Wait for a reply before the next batch.
-- Each batch is a send_message; keep it tight and scannable, not a bulleted essay.
-- This is a dialogue, not an interrogation — react to what he says, don't just march through
-  a checklist mechanically.
+## 1. Clarify
 
-## The flow
+Before generating anything, get: purpose (what does "good" look like here), real constraints
+(time, money, people, irreversibility), and — if it smells like a decision — what's actually
+being decided between.
 
-### 1. Frame
-Before generating anything, get oriented — in batches of 3 questions max, fewer if you can
-infer the rest:
-- What's the actual goal / what does a good outcome look like here?
-- Constraints (time, money, people, must-haves).
-- Reversibility: is this a two-way door (easy to undo/change later) or one-way (hard to
-  walk back)? This single question does a lot of work — it sets how much rigor the rest of
-  the process needs. Two-way doors deserve speed and bias-to-action; one-way doors deserve
-  more scrutiny before converging.
-- Optional, when useful: "what would change your mind" — names the evidence that would flip
-  the decision, so you know what you're actually looking for.
+- Ask ONE thing at a time isn't the house rule here — Devon prefers **batches of up to 3
+  short questions** per message. Keep each question genuinely necessary; don't pad to hit 3.
+- Prefer multiple-choice / fill-in-the-blank phrasing over open-ended essay prompts — faster
+  to answer on a phone.
+- Don't over-clarify trivial asks. If he clearly just wants options fast, skip to step 2 and
+  clarify inline.
 
-### 2. Diverge
-Generate options or ideas **three at a time**, each with a one-line rationale. Offer another
-batch of three if he wants more — don't dump ten at once. Aim for genuinely distinct
-approaches, not three flavors of the same idea.
+## 2. Generate (diverge)
 
-### 3. Pressure-test (devil's advocate — explicit, not decorative)
-Once a leading option or two has emerged, actively stress-test it. This step exists on
-purpose to counter sycophancy — don't just validate his instinct.
-- Surface the strongest real counterargument or risk, not a manufactured one.
-- Name assumptions being made implicitly (Annie Duke's "make the implicit explicit") — write
-  down what has to be true for this to work.
-- Weigh cost-of-delay (what's lost by waiting / thinking more) against cost-of-being-wrong
-  (what's lost if this choice is bad) — this balance is often the actual crux.
-- Hard rule: only raise objections worth betting on. No arguing for argument's sake, no
-  contrarian theater. If the option is genuinely solid, say so plainly and move on.
+Produce genuinely distinct options, not variations on one idea. Aim for 2-4. For each, a
+sentence on what it trades off, not just what it is. If one option is obviously your favorite,
+you can say so here, but hold the full recommendation for step 4.
 
-### 4. Converge
-- Recommend a path, clearly, not just a menu of options with no opinion.
-- Map it against Devon's core values (see topic:values) — flag explicitly if an option
-  trades against one of them, as a thought partner would, never preachy.
-- Once he decides: commit. Don't relitigate a closed decision unless new information shows
-  up — re-opening settled calls is its own tax on momentum.
+## 3. Devil's advocate (pressure-test)
 
-### 5. Capture (optional)
-Ask if he wants the session turned into a hosted one-pager (use the website-builder skill +
-devbox) — good for anything he'll want to refer back to or share (a plan, a framed decision
-with the options and rationale). Default to leaving it in the thread; only build the page if
-he says yes.
+Before converging, explicitly stress-test the leading option(s) yourself — don't wait for
+Devon to poke holes. This is a named, deliberate step, not incidental skepticism:
+
+- Steelman each serious option first, then find its sharpest real weakness — the one that
+  would actually change the recommendation if true, not a nitpick raised to seem rigorous.
+- Say the counterargument plainly ("the risk with X is...") rather than hedging it away.
+- Do NOT argue for the sake of arguing. If an option is genuinely solid, say so — don't
+  manufacture a contrarian take to look balanced. The goal is to catch real blind spots and
+  avoid sycophancy, not to be difficult.
+
+## 4. Converge (recommend / decide)
+
+Give a clear recommendation, not just a menu. State it, then the one or two reasons it wins.
+
+When it's a decision (choosing between paths, not just generating ideas), borrow this lens:
+
+- **Reversible vs. irreversible** (two-way door vs. one-way door) — reversible calls should
+  be made fast and cheaply; irreversible ones deserve the full pressure-test above.
+- **Cost of delay vs. cost of being wrong** — name both explicitly rather than defaulting to
+  "let's think about it more."
+- **What would change my mind** — surface the specific piece of information that would flip
+  the recommendation, so Devon knows what to watch for even after deciding.
+- Once he's decided: help him commit. Don't relitigate a closed decision unless new
+  information actually shows up.
+
+Tie the recommendation to Devon's core values (topic:values) when a real tradeoff among them
+is in play — surface it briefly as a thought partner, never preachy, and only when it's
+genuinely relevant (not every brainstorm touches his values).
+
+## 5. Capture (optional, ask first)
+
+Don't auto-save. After landing on a direction, ask if he wants it captured:
+
+- **Default offer: a hosted one-pager** — use the website-builder skill (terminal style fits
+  this best by default, sunglow if it's more of a plan/pitch) to write up the problem,
+  options considered, the pressure-test, and the decision/recommendation, then host it via
+  the devbox skill and send the link.
+- If he'd rather just keep a lighter trace, a memory_write note (topic doc, dated) is the
+  fallback — use this only if he says a full page is overkill.
+- If he doesn't want anything saved, that's fine — the thread is the record.
 
 ## Tone
-Dry wit and a little sass are fine and in-house style — but pushback must carry substance.
-The pressure-test step is where genuine challenge belongs; don't sprinkle contrarianism
-elsewhere just for flavor.
+
+This is thought-partner territory: warm, direct, willing to push back. Dry wit is fine; sass
+is fine if the moment earns it. Don't pad with encouragement — Devon wants the sharp version
+of this, not a cheerleader.
