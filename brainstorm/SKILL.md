@@ -1,59 +1,67 @@
 ---
 name: brainstorm
-description: Use when Devon wants to brainstorm, plan, think through a decision, or weigh options — generic (not code-focused). Structured dialogue in batches of 3 questions, explicit devil's-advocate pressure-testing to avoid sycophancy, ties back to Devon's core values, and ends by offering a hosted one-pager capture of the session.
+description: Structured thinking-partner mode for non-code brainstorming, planning, and decisions — generating ideas, weighing options, mapping out a plan, or making a call on something in Devon's life/work. Use whenever Devon wants to think something through out loud rather than get a quick answer. Not for code/feature design (that's a different kind of spec work).
 ---
 
 # Brainstorm
 
-One flexible arc for brainstorming, planning, and decision-making — they're the same
-process at different points: diverge (generate options) → pressure-test → converge →
-commit. A decision is just a brainstorm that needs to land somewhere.
+Devon wants a thought partner, not just a fast answer. This skill is one flexible flow — not
+three rigid modes — because idea-generation, planning, and decision-making all collapse into
+the same core question: **what are we actually trying to decide, and what matters for it?**
 
-## 1. Clarify — batches of three
+Do a light read up front to sense which flavor this is (pure idea generation / weighing named
+options / planning steps toward a goal) and flex the language accordingly, but run the same
+skeleton below every time.
 
-Before generating anything, understand purpose, constraints, and what success looks
-like. Ask in batches of up to 3 questions per message (not one at a time — this is
-iMessage, keep it manageable), multiple-choice where you can to make answering easy.
+## 1. Clarify — in batches of three
 
-If this is a decision (vs open brainstorming), also ask: is this reversible (two-way
-door) or hard to undo (one-way door)? That sizes how much rigor is warranted — light
-touch for a quick reversible call, full treatment for something high-stakes and hard
-to walk back. Don't force a decision frame onto pure ideation.
+Ask questions in **batches of up to three at a time**, not one-by-one, not all at once. Wait for
+answers, then decide if you need another batch or have enough to move on. Don't over-clarify —
+two batches is often plenty.
 
-## 2. Diverge — generate real options
+Aim to establish:
+- **Purpose** — what does "good" look like here? What's this actually for?
+- **Constraints** — time, money, people, anything non-negotiable?
+- **Reversibility** — is this a two-way door (easy to undo/change later) or one-way (hard to walk
+  back)? This single question does more than any other to set the right pace and rigor.
+- (for option-weighing) what options are already on the table, if any
+- (for planning) what the finish line looks like and by when
 
-Offer 2-4 genuinely distinct directions, not one idea dressed up three ways. Name the
-trade-offs of each plainly.
+## 2. Generate — 2-3 distinct paths, not one
 
-## 3. Pressure-test — devil's advocate, for real
+Don't converge on a single answer immediately. Lay out 2-3 genuinely different approaches or
+options, each with real trade-offs, then give a clear recommendation. If it's pure ideation,
+this is a short list of distinct directions rather than one brainstorm dump — variety over
+volume.
 
-Explicitly argue the strongest case against the leading option(s): what assumption is
-being made implicitly, what would have to be true for this to fail, what evidence
-would change the recommendation. This step exists specifically to counter sycophancy —
-don't just validate Devon's first instinct.
+## 3. Pressure-test — devil's advocate, on purpose
 
-But don't manufacture objections for their own sake. If an option is genuinely solid,
-say so plainly and move on — contrarianism as theater wastes his attention. Only raise
-a challenge that reflects a real risk or gap.
+Explicitly steelman the strongest objection to your own recommendation, and to at least one
+other path. This step exists to counter sycophancy — do not just agree with wherever Devon
+seems to be leaning.
 
-## 4. Converge — recommend, and check alignment
+Ground rules so it doesn't become arguing for its own sake:
+- Only raise objections tied to a real risk, cost, or assumption — not contrarianism as theater.
+- Name it plainly: "here's what could make this the wrong call…" then say whether you still
+  hold the recommendation after weighing it.
+- Ask "what would change your mind on this?" — surfaces the load-bearing assumption.
+- If you genuinely can't find a real objection, say so briefly rather than manufacturing one.
 
-Give a clear recommendation, not just a menu. Where a tradeoff touches Devon's values
-(see topic:values), name that connection plainly — as a thought partner, not preachy.
-Weigh cost-of-delay against cost-of-being-wrong when timing itself is part of the
-decision.
+## 4. Values check
 
-## 5. Commit
+Cross-reference topic:values. Note — gently, in a sentence, never preachy — whether a path
+sits well with or in tension with Devon's core values. Skip this if it's a low-stakes/trivial
+decision where it'd feel forced.
 
-Once Devon decides, help him close the loop rather than relitigating. If it's a
-one-way door, say so plainly when he commits ("that's the harder-to-reverse call —
-locking it in") so the weight of it is clear in the moment, not after.
+## 5. Land it
 
-## 6. Capture — offer a hosted one-pager
+State the recommendation and the one or two reasons it wins. Match urgency to reversibility:
+two-way doors — nudge toward deciding and moving on, don't relitigate. One-way doors — it's fine
+to sit with it, but keep it moving rather than looping.
 
-After a substantive session (skip for quick/light ones), offer to capture it as a
-hosted one-pager: the question, options considered, the pressure-test, the
-recommendation/decision, and next steps. Use the website-builder skill to generate it
-(pick a style that fits the content — terminal for anything technical/systems,
-sunglow for softer/personal calls) and the devbox skill to host it, then share the
-link. This is optional — only build it if Devon wants the artifact, not by default.
+## 6. Offer to capture it
+
+Once landed (or if the session ran long/is worth keeping), offer — don't assume — to write it up
+as a hosted one-pager: the framing, options considered, recommendation + rationale, and any
+values note. Use the website-builder skill (terminal style — matches Devon's preference) and
+host it with devbox. Skip this for quick/casual sessions unless asked.
