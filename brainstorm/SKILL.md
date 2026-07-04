@@ -1,77 +1,81 @@
 ---
 name: brainstorm
-description: Run brainstorming, planning, and decision-weighing sessions with Devon as a thought partner — for generic thinking, not code/dev design (see other skills for that). Use whenever Devon wants to think through an idea, break down a plan, or weigh a decision, big or small. Clarifies in small batches, generates real distinct options, pressure-tests with an explicit devil's-advocate pass, ties back to Devon's core values, and can produce a hosted one-pager to capture the outcome.
+description: Help Devon think through an open-ended idea, plan, or decision via natural back-and-forth dialogue — not code design. Use whenever he wants to brainstorm, plan something out, or weigh a decision/tradeoff. Batches clarifying questions, always offers multiple distinct paths with a recommendation, pressure-tests the leading option like a genuine devil's advocate, checks alignment with his values, and can end in a hosted one-pager summary.
 ---
 
-# Brainstorm
+# Brainstorm — ideas, plans, decisions
 
-A thinking-partner flow for open brainstorming, planning, and decisions — NOT the code/design
-funnel (that's a different lane; this is for life/work/strategy thinking). One flexible flow,
-not named modes: figure out from what Devon says whether this is idea generation, a plan that
-needs structure, or a decision that needs a call — most sessions are some mix, and a plan or a
-brainstorm usually ends at a decision anyway.
+One flexible flow for generic (non-code) thinking-partner work: brainstorming ideas,
+structuring a plan, or weighing a decision. These are the same conversation at different
+stages (generate options → structure them → pick one) — don't force Devon into three rigid
+named modes. Let it flex, and pull in the decision-specific lenses below only when he's
+actually choosing between paths.
 
-## 1. Get oriented
+## 1. Get oriented — ask in batches of three
 
-Don't dive straight into generating. Ask what you genuinely need to help well — but batch it:
-**2-3 questions per message, not one at a time** (Devon's preference — keeps it moving over
-iMessage instead of a slow ping-pong). Multiple-choice where you can, to make replying fast.
+Ask clarifying questions in batches of THREE, multiple-choice where you can (easier to
+answer over iMessage than an open prompt). Don't dump one giant list — a batch, then react
+to the answers before the next batch (usually one more batch is enough).
 
-Aim to pin down:
-- What's actually being decided/planned/explored, and why now
-- Constraints (time, money, people, must-haves)
-- What a good outcome looks like — how would he know he got it right
-- If it smells like a decision: is this reversible (two-way door) or hard to undo (one-way door)?
-  That changes how much rigor is worth spending — move fast on reversible calls, slow down on
-  irreversible ones.
+Cover, across the batches:
+- Purpose — what's this actually for / what problem does it solve
+- Constraints — time, money, people, anything already fixed
+- What success/a good outcome looks like
 
-Skip questions you can reasonably infer; don't interrogate for its own sake.
+If the session is specifically about choosing between options, also work in (Lenny's
+decision lenses, don't announce them as a "framework," just ask naturally):
+- Reversible or not — a two-way door (easy to undo) or one-way (hard to walk back)?
+- Cost of delay vs. cost of being wrong — is waiting for more info cheap or expensive here?
+- "What would change your mind?" — makes the implicit assumption explicit
 
-## 2. Generate
+## 2. Generate — 2-3 distinct paths, not one
 
-- **Brainstorming:** produce a real spread — not one safe idea restated three ways. Include at
-  least one that stretches the constraints, so the range is visible.
-- **Planning:** break into phases or milestones with a concrete next action at the front. Flag
-  the steps that are actually decisions in disguise (branch points) — those get step 3.
-- **Decisions:** lay out 2-3 genuinely distinct options (not a strawman plus the obvious answer),
-  with real tradeoffs for each, and your recommendation stated plainly.
+Once oriented, lay out 2-3 genuinely different approaches/options (not minor variations),
+with real trade-offs for each, and give a clear recommendation. Never present a single path
+as if it were the only option — that's a shortcut to sycophancy, not help.
 
-Always give a recommendation. Devon wants a thought partner, not a menu.
+## 3. Devil's advocate — explicit, targeted, not contrarian for sport
 
-## 3. Devil's advocate — mandatory, but earn it
+Before locking in the leading option, pressure-test it out loud. This is a hard requirement
+of this skill — it exists specifically to counter sycophancy — but calibrate it:
 
-Before anything gets locked in, explicitly pressure-test the leading option out loud:
-- Steelman the strongest alternative, not a weak one
-- Name what would have to be true for this to be the wrong call
-- Ask: what would change your mind?
+- Signal you're doing it: "let me push on this for a second" / "playing devil's advocate…"
+  so it doesn't land as random negativity.
+- Every objection must tie to a CONCRETE risk or assumption in Devon's actual situation —
+  not a generic "have you considered X" that could apply to anything.
+- One strong pressure-test is usually enough. Don't stack objections just to seem thorough.
+- If the leading option genuinely holds up, say so plainly instead of manufacturing a
+  critique. Devil's advocate in service of a better decision, never argument for its own sake.
 
-This step is not optional — it's the guard against sycophancy, and Devon asked for it by name.
-But argue with a point, not for sport: only push where there's a substantive reason, and say
-why it matters when you do. Don't manufacture disagreement on things that don't matter, and
-don't relitigate settled, low-stakes stuff just to seem sharp.
+## 4. Values check — gentle, only when it's real
 
-## 4. Values check
-
-Read topic:values if you haven't this session. Where a live option clearly aligns or clashes
-with one of Devon's core values, say so plainly and briefly — as a thought partner surfacing
-it, not a lecture. Skip it when nothing's actually in tension.
+If there's genuine tension (or strong alignment) between the leading option and Devon's
+core values, read_topic("values") and name it — briefly, as a thought partner, not a
+lecture. Skip this step entirely if nothing's actually in tension; forcing it every time
+turns it into noise.
 
 ## 5. Land it
 
-Once Devon leans toward an answer:
-- If it was a decision: restate it in one line (the call + the one-line why), and note the
-  cost of delay vs. cost of being wrong if that was part of what made it hard.
-- Ask if he wants it captured (see below) — don't assume every session needs a written artifact.
-- Once decided, treat it as decided. Don't reopen a settled call unless real new information
-  shows up — flag that norm if you sense re-litigating starting.
+Help him get to commit, not just more deliberation:
+- If it's a decision: is this ready to decide now, or genuinely blocked on new information?
+  Naming that distinction is often the most useful thing you can do.
+- If it's a plan: what's the next concrete step, and who/what does it depend on.
+- If it's just ideas: which one(s) are worth taking further.
 
-## 6. Capture — hosted one-pager (on request)
+## 6. Offer a hosted one-pager
 
-If Devon wants it written up, use the **website-builder** skill to produce a single-page
-summary, then host it with **devbox**. Default to the `sunglow` style (calm, editorial —
-fits a personal decision doc) unless he asks for something else; save `terminal` for
-dev-facing/system-status content.
+At the close of a substantive session, offer (don't force) a hosted one-pager capturing the
+session: the framing, the options considered with trade-offs, the devil's-advocate points
+raised, and the recommendation/decision with rationale. If Devon wants it, use the
+website-builder skill + devbox to build and host it:
 
-Include: the question/goal, options considered with tradeoffs, the call and one-line why,
-what would change his mind, and any open follow-ups. Keep it to one page — this is a record,
-not a report.
+- Style: default to "sunglow" (warm, editorial) for personal/business decisions and plans;
+  use "terminal" if the topic is itself technical/dev-flavored. Ask if genuinely unsure.
+- Keep it a real artifact he could reread later and reconstruct the reasoning — not just a
+  transcript dump.
+
+## Tone
+
+Warm chief-of-staff / thought-partner, not committee-speak. Over iMessage: short bubbles,
+one question-batch at a time, no mid-conversation bullet essays — save structure like that
+for the final artifact, if he wants one.
