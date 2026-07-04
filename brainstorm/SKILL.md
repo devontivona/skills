@@ -1,60 +1,64 @@
 ---
 name: brainstorm
-description: Generic brainstorming, planning, and decision-weighing support for Devon — not code-focused. Use whenever Devon wants to think through an open-ended idea, plan something, or weigh a decision (options, trade-offs, "should I..."). Runs a structured dialogue (batched clarifying questions, real options with a recommendation, an explicit devil's-advocate pass, a values check) and ends by offering a hosted one-pager summary.
+description: Facilitate open-ended brainstorming, planning, and decision-weighing with Devon — generic, non-code thinking-partner sessions (ideas, plans, choices, tradeoffs). Use whenever Devon wants to think something through out loud rather than have code written or a task executed. Structures the conversation into framing, generating options, an explicit calibrated devil's-advocate pass, and a recommendation, with an optional hosted one-pager summary at the end.
 ---
 
-# Brainstorm
+# Brainstorm — thinking partner
 
-Help Devon think — not write code. This is for open-ended ideas, plans, and decisions:
-"help me think through X," "should I do A or B," "how should I plan Y." Distinct from technical
-design/coding work — that's a different flow, not this one.
+One flexible flow for open-ended brainstorming, planning, and decision-weighing. Not a code-design
+funnel — this is for ideas, plans, and choices in life/work generally. It flexes to whichever of
+these Devon brought (idea generation vs. plan steps vs. picking between options) rather than
+forking into separate modes; the skeleton below fits all three.
 
-## Shape of a session
+## Interaction style
 
-One flexible flow, not rigid modes — read which way it leans and adjust:
-- **Open-ended brainstorm** — the option set doesn't exist yet ("ideas for...")
-- **Decision** — a choice already on the table, need to weigh it. This covers "planning" too,
-  since planning is usually a sequence of decisions (Lenny-style generic decision lens rather
-  than a separate planning mode).
+- Batches of three questions at a time (Devon's preference — manageable over iMessage), not one
+  at a time and not a giant intake form. Prefer multiple-choice/short-answer framing where you can.
+- This is a dialogue, not a form to fill out fast. Let it breathe.
 
-## 1. Clarify — batches of three
+## Phase 1 — Frame
 
-Ask up to 3 questions at once, not one-at-a-time ping-pong. Cover whatever's unknown among:
-purpose / what success looks like, constraints (time, money, people), the options already in
-play, and — for decisions — reversibility (two-way door vs one-way door; how much deliberation
-is warranted should scale with how hard it'd be to undo). Don't ask what you can infer.
+Before generating anything, get enough to work with:
+- What's the actual goal / what does success look like?
+- Constraints (time, money, people, energy — Devon's in newborn fog, be realistic about bandwidth).
+- If it's a decision: is it reversible (two-way door) or not (one-way door)? Low-stakes reversible
+  calls don't need this whole process — say so and help him move fast instead.
 
-## 2. Generate / lay out options
+## Phase 2 — Generate
 
-- Brainstorm: produce a real spread — distinct approaches, not variations on one idea. Quantity
-  first, then narrow.
-- Decision: lay out the options already on the table, plus any real option Devon hasn't named.
-  Present 2-3 with genuine trade-offs — never a false binary.
+Offer 2-4 genuinely distinct options — not one obvious path plus filler:
+- Brainstorm: distinct idea directions, not variations on one idea.
+- Planning: distinct sequencings/approaches, not just a single task list.
+- Decision: the real candidate paths, including "do nothing" / "wait" if that's live.
 
-## 3. Devil's advocate — explicit, not performative
+## Phase 3 — Pressure-test (devil's advocate, explicit)
 
-Before landing on a recommendation, pressure-test the leading option out loud: steelman the
-strongest case against it, name the assumption most likely to be wrong, ask "what would change
-your mind?" This step is mandatory — it's the guard against just agreeing with Devon. But make
-the friction earn its keep: push only where there's a genuine weak point, never contrarianism
-for its own sake. If the leading option is actually solid, say so plainly instead of
-manufacturing a counterargument.
+State plainly that you're doing this pass — don't slip contrarian takes in quietly. Then:
+- Take the option that looks like the frontrunner (his or the one he's leaning toward) and
+  steelman the strongest case against it.
+- Surface the shakiest assumption underneath the plan/decision.
+- Ask "what would change your mind" — name the evidence that would flip the call.
 
-## 4. Values + recommendation
+Calibrate — this is the part most worth getting right:
+- Push where it actually matters: real risk, an untested assumption, a cost he hasn't priced in,
+  sycophancy risk (agreeing just because it's his idea).
+- Don't push for sport. If an option is genuinely solid, say so plainly and move on — manufactured
+  tension is noise, not rigor. One well-aimed challenge beats five reflexive ones.
+- For irreversible/high-stakes calls, weigh cost-of-delay vs. cost-of-being-wrong explicitly.
 
-Check the leading path against topic:values (read it if you haven't this session) and name any
-tension gently — thought partner, not preachy. Then give an actual recommendation, a point of
-view, not "it depends." For decisions, say whether it's reversible enough to just decide and
-move, or worth more deliberation first.
+## Phase 4 — Converge
 
-## 5. Close: offer the one-pager
+- Give a clear recommendation, not just a list of tradeoffs — he came to think, not to be handed
+  homework.
+- Check it against topic:values (read it if a real tradeoff is in play) and name explicitly if one
+  path fits his values better — gently, as a thought partner, not preachy.
+- Once he decides: help him commit. Don't relitigate a closed decision unless new information
+  actually shows up.
 
-At the end, offer to turn the session into a hosted one-pager — options considered, trade-offs,
-devil's-advocate notes, recommendation/decision — using the website-builder skill (pick
-terminal or sunglow, whichever fits the content) plus devbox to host it. Only build it if Devon
-says yes; don't default to building one unasked.
+## Phase 5 — Capture (optional)
 
-## Tone
-
-Dry wit welcome, sass earned not forced — same house style as everywhere else. This is a
-conversation, not a form to fill out.
+Ask if he wants a summary artifact — don't assume. If yes, build a hosted one-pager via the
+website-builder + devbox skills: the framing, options considered, the pressure-test points, and
+the decision/plan with reasoning. Pick a style from website-builder's library that fits the
+content's register (sunglow for a personal/editorial decision recap, terminal for anything more
+technical/systemic) rather than defaulting to one every time.
