@@ -50,6 +50,8 @@ missed the next press and could stall.) Two more tricks:
   "all_speakers": ["Bathroom Speaker","Bedroom Speaker","Kitchen Speaker","Living Room","Office","Rec Room","Sonos Move"],
   "volume": 10,
   "primary_speaker": "Kitchen Speaker",
+  "frame_url": "http://CHANGE_ME:8080",
+  "toast_duration_ms": 20000,
   "buttons": {
     "event.kitchen_mmwave_dimmer_scene_003":   {"label":"Kitchen Pendant config button","gesture":"KeyPressed","action":"toggle","mixtape":"poolside"},
     "event.kitchen_mmwave_dimmer_scene_003_2": {"label":"Kitchen Cabinet config button","gesture":"KeyPressed","action":"cycle","mixtapes":["poolside","slow-focus","4-to-the-floor","island-time","feelings","memory-lane","100-percent-hip-hop"]}
@@ -67,6 +69,26 @@ missed the next press and could stall.) Two more tricks:
   Cabinet = cycle poolside → slow-focus → 4-to-the-floor → island-time → feelings →
   memory-lane → Low Key (`100-percent-hip-hop`) → loop.
 
+- `frame_url` — base URL of the EO digital picture frame on the LAN (e.g.
+  `http://10.0.0.x:8080`). When set, each new play publishes an ephemeral **toast**
+  ("Now playing: <Title>") to the frame via `POST /api/toast` (see the eo repo's
+  `docs/eo-api.md`). **Optional and fully fire-and-forget:** if it's missing or left at
+  the placeholder `http://CHANGE_ME:8080`, or if the frame is offline/unreachable, the
+  toast is skipped/logged and **music playback is never affected** (the POST runs in a
+  thread with a ~3s timeout and swallows all exceptions). Must be filled in with the real
+  frame address before toasts will appear.
+- `toast_duration_ms` — optional override for how long the toast stays on the frame
+  (ms). If absent, `listener.py` omits `durationMs` and the frame applies its own default
+  (20000ms / 20s).
+
+### How the toast works (`post_toast`)
+`do_play()` runs the two-stage play (primary speaker, then fan-out) and then calls
+`post_toast(cfg, "Now playing: <Title>")` **once** (not once per speaker). The title is
+scraped from the primary `houseparty play` stdout (`"▶ Playing <Title> on ..."`) via
+regex, falling back to the alias title-cased (hyphens → spaces) if that doesn't match.
+`post_toast` uses stdlib `urllib.request` wrapped in `asyncio.to_thread` (no extra venv
+dependency) so it never blocks the event loop.
+
 ## Common edits
 Always: edit `config.json`, then restart the service.
 ```
@@ -77,6 +99,8 @@ systemctl --user restart houseparty-buttons.service
 - **Change/reorder the cabinet cycle:** edit the `mixtapes` array (use aliases from
   `houseparty list --json`).
 - **Change speakers or volume:** edit `all_speakers` / `volume`.
+- **Point toasts at the frame:** set `frame_url` to the frame's real `http://<ip>:8080`
+  (reserve a DHCP IP or use its mDNS `_eo._tcp` name). Optionally set `toast_duration_ms`.
 - **Map a new switch's button:** add a `"event.<switch>_scene_003": {...}` entry. Find the
   entity via skill:inovelli-switches (`inovelli.py list` for the switch, then its
   `event.*_scene_003`).
