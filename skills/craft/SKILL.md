@@ -35,43 +35,26 @@ python3 ~/.sunny/skills/authored/skills/craft/scripts/craft_mcp.py write "blocks
 (Cloudflare bot detection → 403 "browser_signature_banned"). `craft_mcp.py` already
 sends one; don't strip it if you ever hand-roll a request.
 
-- Second helper: `scripts/fetch_page.py <url>` — fetches a URL and returns clean,
-  readable main-content text via **trafilatura** (a content-density readability
-  extractor — installed 2026-07-06 via `~/.local/bin/pip3 install trafilatura`, see
-  "Environment notes" below). This is a major upgrade over naive tag-stripping: on a
-  GitHub repo page it returns just the README, not ~100 lines of nav/menu chrome.
+- **Reading a linked page's real content is a separate, general-purpose skill:
+  `skill:web-fetch`.** Read that skill for the full extraction strategy (trafilatura
+  → optional Firecrawl fallback for JS-rendered pages → meta-tag fallback), setup,
+  and gotchas — don't duplicate that logic here. In short:
+
+```python
+import sys
+sys.path.insert(0, "~/.sunny/skills/authored/skills/web-fetch/scripts")  # expand ~ first
+import fetch
+result, err = fetch.fetch_text(url)
+```
+
   Used by the resource-tagging job to actually READ a linked page before judging/
   describing it — **never infer a resource's subject from its URL or title alone.**
-  - Prints `ERROR: ...` on hard failure (404, timeout, non-HTML, blocked) — when
-    that happens, fall back to whatever content/blurb is already saved on the Craft
-    page itself, and note the fetch failure in the run summary.
-  - Prints a `WARNING: degraded extraction ...` line (not an error) when the page is
-    likely JS-rendered and trafilatura found little/nothing — it falls back to
-    `<meta description>`/`og:description`/`<title>` in that case, which is often
-    still server-rendered even on SPA sites. **Treat a degraded result as thin,
-    lower-confidence input**: still usable for tagging/description but say so if the
-    resulting description ends up thin, rather than presenting it with full
-    confidence. A dedicated JS-rendering fallback (Jina Reader, r.jina.ai) was
-    evaluated but anonymous requests get blocked from this box (HTTP 401, "bad
-    network reputation") — not wired in; revisit if a real Jina API key is ever
-    added or this becomes a frequent blocker.
-
-### Environment notes — no system pip, had to bootstrap
-
-This box ships bare `python3` with **no pip, no ensurepip, no python3-venv**, and no
-sudo access to `apt install` them. `python3 -m venv` fails outright (needs
-`python3.10-venv`, root-only). The working bootstrap path (2026-07-06):
-```
-curl -sL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-python3 /tmp/get-pip.py --user     # installs pip to ~/.local/bin, but `python3 -m pip` still fails after this
-~/.local/bin/pip3 install trafilatura --user   # THIS is what actually works — use ~/.local/bin/pip3 directly, not `python3 -m pip`
-```
-Packages land in `~/.local/lib/python3.10/site-packages`, which IS on `python3`'s
-default `sys.path` — so once installed, plain `import trafilatura` works fine from
-any script/subagent on this box without any special path setup. The confusing part:
-`python3 -m pip` keeps saying "No module named pip" even after a successful `get-pip.py`
-run — always invoke the installed `~/.local/bin/pip3` binary directly instead of `python3
--m pip` on this box.
+  `err` is set on hard failure (404, timeout, non-HTML, blocked) — fall back to
+  whatever content/blurb is already saved on the Craft page itself in that case, and
+  note the fetch failure in the run summary. `result["degraded"]` is True when the
+  page was likely JS-rendered and only a thin meta-description fallback was
+  available — treat that as lower-confidence input, and say so if the resulting
+  description ends up thin rather than presenting it with full confidence.
 
 ## Tools exposed (`craft_read` / `craft_write`)
 
@@ -181,10 +164,10 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
      `#sunny`, stop here — add to processed cache and move on. Do not re-tag, re-
      describe, or re-title.**
    - Otherwise, find the actual external link in the doc (usually a `richUrl` block
-     near the top) and **fetch it** with `scripts/fetch_page.py <url>` to read the
-     real page content — do not judge, tag, or describe from the URL/title alone.
-     If the fetch fails, fall back to whatever text/blurb is already saved in the
-     Craft doc itself, and note the failure in your summary.
+     near the top) and **fetch it via `skill:web-fetch`** (see the Connection section
+     above) to read the real page content — do not judge, tag, or describe from the
+     URL/title alone. If the fetch fails, fall back to whatever text/blurb is already
+     saved in the Craft doc itself, and note the failure in your summary.
    - Decide if it's a genuine single-topic saved resource (one link, one subject —
      a repo, article, product, tool, business, etc.) versus something that should be
      marked done without a resource tag: personal notes, reflections, checklists,
@@ -247,8 +230,7 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
 - Currently scoped to `--location unsorted` only. Daily notes sometimes contain
   single-link clips too, but are treated as journal space — extending this job to
   daily notes needs an explicit go-ahead from Devon first.
-- `fetch_page.py` sends a real browser User-Agent and strips script/style/nav tags,
-  but it's a best-effort text dump (via BeautifulSoup+lxml if installed, else a
-  regex fallback), not a citation-grade extraction — good enough for judgment and
-  description-writing, expect some nav/boilerplate noise in the extracted text and
-  read past it rather than transcribing it into a description.
+- `skill:web-fetch`'s extraction is a best-effort content dump, not a citation-grade
+  extraction — good enough for judgment and description-writing, expect some
+  nav/boilerplate noise in the extracted text and read past it rather than
+  transcribing it verbatim into a description.
