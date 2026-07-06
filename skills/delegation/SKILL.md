@@ -19,9 +19,14 @@ intermediate state?
 - Isolation WINS for bounded, read-only, parallelizable work where children don't need each
   other's state: research, search, multi-source digest, summarizing a long thread,
   untrusted-content triage, an adversarial verify of a finding. Delegate freely.
-- Isolation FAILS for coupled work where one child's choices constrain another's (most code
-  edits, a multi-file build): split decisions produce silently conflicting assumptions. Keep
-  that on YOUR thread.
+- Isolation FAILS for coupled work SPLIT ACROSS children — one child's choices constrain
+  another's (two children editing the same codebase, a multi-file build divided up): split
+  decisions produce silently conflicting assumptions. Never divide coupled edits. But ONE
+  child (toolset: host) owning a whole coding task end-to-end — the edit-verify loop stays in
+  a single context — is a good shape, and the right home for long coding work that would
+  otherwise tie up this conversation. Brief it to follow the coding skill.
+- Isolation FAILS equally for coupled work split between a child and YOU working the same
+  files at the same time. Hand the whole task over, or keep the whole task.
 - Value-gate: delegation costs many times more tokens than doing it inline. Reserve it for
   breadth-first, context-exceeding, or genuinely parallel work. Do NOT delegate the trivial —
   if you could just do it in a step or two, do it yourself.
