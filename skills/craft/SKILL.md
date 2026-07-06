@@ -1,6 +1,6 @@
 ---
 name: craft
-description: Read, write, search, and organize Devon's Craft.do space via its MCP server (saved links, daily notes, tasks, kanban collections). Use whenever a task involves Craft, Craft documents, tagging saved links with #resources/ tags, journaling in Craft, or the Craft-as-second-brain workflow. Includes the daily resource-tagging + description + title-cleanup job.
+description: Read, write, search, and organize Devon's Craft.do space via its MCP server (saved links, daily notes, tasks, kanban collections). Use whenever a task involves Craft, Craft documents, tagging saved links with #resources/ tags, journaling in Craft, the Craft-as-second-brain workflow, or Devon's task list ("what are my tasks", "add X to my tasks", "remind me to..." as a save-for-later item rather than a scheduled job). Includes the daily resource-tagging + description + title-cleanup job and Craft Tasks as Devon's task-management hub.
 ---
 
 # Craft.do integration
@@ -85,6 +85,77 @@ link generated from inside that space in Craft's UI, then added as a second entr
 
 Devon's Space had, as of the last full read: 155 documents, ~145 in "unsorted" (no
 folder structure), 9 daily notes (gappy), 15 stale tasks.
+
+## Task management — Craft Tasks is Devon's task hub (set 2026-07-06)
+
+Devon uses **Craft's own Tasks feature** as his real task list — not a separate todo
+app, not a Craft doc full of checkboxes as a workaround. When Devon (or Sunny, e.g.
+noticing something he mentioned wants doing later) wants to save something to come
+back to, it goes into Craft Tasks via `tasks add`/`tasks update`/`tasks delete`, not
+into memory, not into a scratch doc.
+
+**Do not confuse this with `schedule_create`.** They solve different problems:
+- **Craft Tasks** = a human-facing todo/reminder list — "things Devon wants to do or
+  decide," surfaced to him in Craft's UI, that HE (or Sunny, when asked) will act on.
+  Nothing about adding a Craft task causes Sunny to autonomously do anything later.
+- **`schedule_create`** = Sunny's own mechanism for *actually performing work later*
+  (a one-time reminder-to-self, a recurring job like the daily resource-tagger). This
+  is Sunny's execution scheduler, not a place to jot down Devon's personal to-dos.
+
+If a request is "save this for later, I'll get to it" → Craft Tasks. If a request is
+"have you actually go do/check this at a later time" → `schedule_create`. Some things
+are both (e.g. "remind me tomorrow to call the vet" could be a Craft task with a
+schedule date that Devon sees in his UI, OR a Sunny schedule that pings him — ask if
+ambiguous which is meant).
+
+### Reading tasks — always filter out template tasks
+
+`tasks list --scope all` (or any other scope) returns EVERY task block in the space,
+including ones that live inside **template documents** — e.g. Craft's built-in "Daily
+note" template ships with habit-tracker checkboxes (sleep, water, exercise, dinner,
+reflection, "*List tasks here*") baked in as a template default. Those are not real
+tasks; a template renders them into new documents every day but they are the
+template's own scaffolding, not something Devon added.
+
+**Before showing Devon any task list, filter out anything whose `in: <docId>` matches
+a document living in Craft's `templates` location:**
+
+```python
+# 1. Get template doc IDs
+templates = craft_mcp.read("documents list --location templates")
+# 2. Get tasks
+tasks = craft_mcp.read("tasks list --scope active")  # or whatever scope
+# 3. Drop any task whose "in: <docId>" matches a template doc's rootBlockId
+```
+
+As of 2026-07-06 there's one template: **"Daily note"**
+(`5549A459-269D-41E5-9B20-D8AEAE691DEB`) — but re-check `documents list --location
+templates` each time rather than hardcoding this id, in case Devon adds more
+templates later. This filtering isn't something Craft's task API does natively (a
+task record doesn't self-flag "I'm in a template") — it's a cheap cross-reference
+Sunny should always do before presenting a task list, not a one-off fix.
+
+### Commands
+
+`tasks list [--scope active|upcoming|inbox|logbook|document|all] [--document
+<rootBlockId>]` — scopes: `active` (open, due today-or-earlier), `upcoming` (open, due
+tomorrow-or-later), `inbox`, `logbook` (done/canceled), `document`, `all` (every task
+block space-wide, not a union of the others).
+
+`tasks add --markdown <text> [--location inbox|dailyNote|document] [--schedule
+<date>] [--deadline <date>] [--state todo|done|canceled] [--repeat <shorthand|json>]`
+— defaults to the inbox if no `--location` given (a sensible default for "add this to
+my tasks" with no other context). `--repeat` supports shorthand like `weekly:mon,wed`
+or `flexible:weekly:fri` (relative to completion) — see `tasks add --help` for the
+full JSON form. For adding many at once, `--tasks '<json array>'` is faster than
+looping single adds.
+
+`tasks update --task <taskId> [--markdown <text>] [--state todo|done|canceled]
+[--schedule <date>] [--deadline <date>] [--location ...] [--repeat <json>]
+[--no-repeat]` — marking `--state done`/`canceled` auto-moves the task to the logbook.
+
+`tasks delete --task <taskId>` — permanent; prefer `--state canceled` if the intent is
+just "no longer relevant" rather than "never happened."
 
 ## Tag taxonomy rules (set by Devon, 2026-07-06 — read carefully)
 
