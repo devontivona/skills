@@ -49,7 +49,7 @@ working directory (~/.sunny). It does validate → commit → push in one step:
 
        bash(command: 'node skills/skill-authoring/scripts/skill.mjs save my-skill')
 
-4. Tell the owner you created it (send_message). It is auto-discovered on your next turn.
+4. Tell the owner you created it (in your reply). It is auto-discovered on your next turn.
 
 ## Editing a skill
 

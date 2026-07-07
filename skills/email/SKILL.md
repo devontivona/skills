@@ -20,7 +20,7 @@ account is the right one; check which inbox the task actually needs.
 Config: `~/.config/himalaya/config.toml`, one `[accounts.<name>]` section per mailbox. Each
 account's credential is injected as its own env var (see below) — never share one credential
 across accounts, and never guess a password; if a needed credential is missing, ask the owner
-(send_message) to add it to the vault, then register it with credential_manage.
+(in your reply) to add it to the vault, then register it with credential_manage.
 
 Omitting `-a` uses the default (`sunny`). **Always pass `-a` explicitly** for anything touching
 someone else's mailbox — don't rely on the default silently being "right."
@@ -86,7 +86,7 @@ Sunny send on their behalf.
 ## Sending (acts as whoever owns the account — confirm first)
 
 Sending speaks AS the account holder, so confirm the recipient, subject, and body with the owner
-via send_message BEFORE sending on someone else's account (Devon's, or a future family member's)
+in your reply BEFORE sending on someone else's account (Devon's, or a future family member's)
 — this is even more important than on Sunny's own mailbox, since it's their voice, not Sunny's.
 Then run `himalaya message send -a <account>` with the message on stdin and that account's
 credential injected. Build the raw message with printf, including From/To/Subject headers, a

@@ -128,7 +128,7 @@ Rules for credentials in every case:
 
 - Refer to a credential by its **registered name** (run `credential_manage` action `list`). Never
   hand-build or guess an `op://` reference.
-- If the credential you need isn't registered, do NOT invent one — ask the owner (`send_message`)
+- If the credential you need isn't registered, do NOT invent one — ask the owner (in your reply)
   to add it to the Sunny vault, then use `credential_manage` (`discover` → `register`) to record
   it yourself (same flow as the `email` skill).
 - Once a session is seeded/saved, later runs reuse it — you should not need the credential again

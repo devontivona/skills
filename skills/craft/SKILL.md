@@ -58,6 +58,12 @@ result, err = fetch.fetch_text(url)
 
 ## Tools exposed (`craft_read` / `craft_write`)
 
+Your toolset may also carry these natively as `craft__craft_read` / `craft__craft_write`
+(live MCP tools — present in owner-DM turns and host-endowed runs). Both paths hit the same
+server; the `craft_mcp.py` helper over bash is the documented, battle-tested path for the
+procedures below (it handles the Cloudflare quirk) — prefer it for jobs, and don't mix paths
+mid-procedure.
+
 Both take a single `command` string argument (shell-like syntax, `--flag value`).
 Batch multiple commands with semicolons. Full command reference:
 

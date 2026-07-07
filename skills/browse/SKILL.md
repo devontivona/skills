@@ -44,7 +44,7 @@ arg), the same masking the email skill relies on:
 The value is injected into the subprocess env, masked out of the output, and never enters your
 context. Refer to credentials by their registered NAME (run credential_manage action "list" to
 see them); never hand-build or guess an op:// reference. If the credential you need is missing,
-do NOT invent one — ask the owner (send_message) to add it to the Sunny vault, then use
+do NOT invent one — ask the owner (in your reply) to add it to the Sunny vault, then use
 credential_manage ("discover" then "register") to record it yourself. See
 references/agent-browser.md for the full auth options (sessions, profiles, state files,
 AGENT_BROWSER_ENCRYPTION_KEY, credential-provider plugins). Once a session is saved, later runs

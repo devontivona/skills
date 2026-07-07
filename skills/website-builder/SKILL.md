@@ -44,7 +44,7 @@ Write to a working directory under the runtime home, e.g. ~/.sunny/sites/<slug>/
 
 Load the devbox skill and use it to serve the site's folder and get a shareable URL. devbox is
 the supported way to run/host/share a local project — do not hand-roll a server. Send the owner
-the URL (send_message).
+the URL (in your reply).
 
 ## 4b. The page-gutter class (prevent edge-to-edge sections)
 
