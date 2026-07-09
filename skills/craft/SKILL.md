@@ -163,6 +163,28 @@ looping single adds.
 `tasks delete --task <taskId>` — permanent; prefer `--state canceled` if the intent is
 just "no longer relevant" rather than "never happened."
 
+### Gotcha: `tasks add --markdown` splits on newlines into MULTIPLE tasks (2026-07-09)
+
+`tasks add --markdown "<multi-line text>"` does NOT create one task with a multi-line
+body — it silently creates a **separate checkbox task per line**. Passing a task title
+plus several lines of notes/context creates one task per line, all as siblings, which
+is never what's wanted for "one task with supporting detail in its body."
+
+**For a task that needs a body/notes beyond its one-line title:**
+1. `tasks add --markdown "<title only, one line>"` — creates the single real task,
+   returns its id.
+2. `blocks add --id <that task's id> --markdown "<the multi-line body text>"` — adds
+   the notes as nested body content under the task (confirmed working: the notes
+   render indented under the task as its own sub-page/content, not as sibling tasks).
+
+**Always verify after writing**, especially for anything multi-line: read the doc back
+with `blocks get <docId> --depth 3-4 --format markdown` and confirm the structure is
+actually one task + nested body, not N sibling tasks. Don't trust the write response
+alone (`tasks add`/`blocks add` reporting success doesn't mean the shape came out
+right) — this bug was hit twice in a row before catching it via a direct read-back,
+including once via a "delete and redo" attempt that reproduced the exact same bug
+instead of fixing it. Slow down on multi-line task content specifically.
+
 ## Tag taxonomy rules (set by Devon, 2026-07-06 — read carefully)
 
 - **Devon does NOT use Craft as a "read it later" app.** `#resources/reads` and

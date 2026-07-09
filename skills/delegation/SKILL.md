@@ -120,6 +120,12 @@ it (retry, drop, or tell the owner).
   "under N words; do not paste raw output"). On a malformed return, re-brief and retry.
 - Children report progress for long tasks and a final result when done — you need not poll.
 - For fan-out, synthesize once the set you need has reported; you may act on partial results.
+- **The owner never sees a subagent's report directly — it lands only in YOUR context.** They
+  did not read it and have no idea what's in it, even if you're mid-conversation with them about
+  it. NEVER react to, argue with, or build on a subagent's findings as if the owner already has
+  that context (e.g. "my pushback on your second point" when they never saw a first point). Every
+  time a report comes back, your very next reply to the owner must actually SUMMARIZE what it
+  said — not just your reaction to it — before you add your own take.
 
 ## 7. Anti-patterns
 

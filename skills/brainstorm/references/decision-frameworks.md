@@ -28,8 +28,7 @@ that's the signal to stop gathering and take the leap. This is the antidote to a
 
 ## High-conviction leaps
 Some decisions can't be solved with data (Brandon Chu). When you've explored honestly and the
-data runs out, name it as a judgment call, take the leap, and own the accountability — don't keep
-pretending more analysis will resolve it.
+data runs out, name it as a judgment call, take the leap, and own the accountability — don't keep pretending more analysis will resolve it.
 
 ## Decide → commit → don't relitigate
 Once decided, commit fully even if you weren't 100% sure ("disagree and commit"). Reopening a
