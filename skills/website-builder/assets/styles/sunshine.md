@@ -20,6 +20,29 @@ secondary chromatic color, used for code surfaces and quiet highlights. Use Suns
 content should feel confident and modern but polished -- launch pages, opinionated explainers,
 comparisons, microsites -- like a professionally art-directed page, not a themed template.
 
+## Emphasis levels (four surfaces, each with a distinct job)
+
+Sunshine encodes emphasis through background surface, not through more color or more
+decoration. There are exactly four levels -- pick the one whose job matches the content, don't
+reach for a stronger one just because a section "feels important":
+
+1. **Yellow surface** -- hero/header bands only. The loudest possible surface; reserved for the
+   very top of the page (see "Yellow usage discipline" below). No dot-grid texture here -- a
+   flat yellow surface is loud enough on its own.
+2. **Dark (charcoal) surface** -- a genuinely major callout: a headline recommendation, a
+   pull-quote, a single dark CTA band. No dot-grid texture here either -- reserve dark surfaces
+   for their own weight. See "Dark Callout" under Components.
+3. **Grey surface + dot-grid** -- the "aside" register: supporting info boxes, secondary
+   callouts, side-column cards (e.g. "what would change this," "next action"). This is the
+   ONLY place the dot-grid texture belongs -- a quiet, low-contrast grey dot field, never
+   yellow or dark. See "The Dot Grid" below.
+4. **Retro window card** -- a spotlight frame for one larger callout or focal figure (photo,
+   diagram, screenshot) that deserves a "look here" treatment beyond a plain card. See "The
+   Retro Window Card" below.
+
+If unsure which level a section needs, default down a level, not up -- most content is level-2
+in the plain sense (an ordinary white/light-gray card) or doesn't need any of these four at all.
+
 ## Fonts (self-contained HTML)
 
 Both faces are on Google Fonts -- one `<link>`, no licensed fonts. Add to `<head>`:
@@ -72,9 +95,10 @@ backdrop is the single most common way this style goes wrong.
   to paper white or light gray.
 - As the background of more than one full-width section on the same page.
 - As the background of ordinary content sections: card grids, comparison tables, feature
-  lists, footers. Footers in particular should be a plain white/light-gray/charcoal band, NOT
-  yellow with a dot grid -- reserve the dot-grid texture for whichever ONE band (hero or CTA)
-  is already the yellow moment, so it doesn't fight for attention twice.
+  lists, footers. Footers in particular should be a plain white/light-gray/charcoal band.
+- With the dot-grid texture on top -- dot-grid is reserved exclusively for grey aside/callout
+  surfaces (see "Emphasis levels" and "The Dot Grid"); a flat yellow surface is loud enough on
+  its own and never needs a texture layered on it.
 - Stacked on an adjacent section that's ALSO yellow (immediate back-to-back yellow bands).
 
 If you find yourself reaching for `--color-electric-yellow` a third time on a page, stop --
@@ -139,16 +163,24 @@ retro window's frame, table containers. A page where every outline is 2px reads 
 cartoonish; keep the outline weight quiet so the flat hard-offset shadows (below) do the work
 of standing things out.
 
-Reserve **2px** for genuine major horizontal dividers only:
-- Band-to-band seams between full-width sections (e.g. where a dot-grid stats band or a dark
-  CTA band meets the surface above/below it).
+**Section-to-section rule: only add a border when two adjacent full-width sections share the
+same background color.** A color change (white -> light-gray -> charcoal, etc.) is itself the
+visual divider -- it doesn't also need a drawn line on top. A border earns its place only when
+both sides are the same surface color and a seam is needed to say "these are still two distinct
+regions" (e.g. two adjacent white sections, or a nav sitting on the same white as the content
+below it). If the sections differ in background color, leave the border off entirely.
+
+Reserve **2px** for genuine major horizontal dividers only, and only where the same-color rule
+above says a border belongs there in the first place:
 - A table's header bottom-border (the line under `<thead>`), because it's the one rule
   separating "column labels" from "all data."
+- A rare same-color band-to-band seam (e.g. two consecutive white sections) where a stronger
+  line is doing real structural work.
 
 Do not use 2px for: button/card/tag/input outlines, in-card dividers (e.g. a spec list's
 top rule), or a sticky nav's bottom border -- those should be 1px. If in doubt, default to
-1px and only go to 2px when the line is doing real structural work (separating whole page
-regions), not decorating a component.
+1px, and remember: no border at all beats a border sitting between two different-colored
+sections.
 
 ### Shadows -- flat, hard-offset, zero blur
 
@@ -166,45 +198,47 @@ Interactive elements can "press": on hover translate by the offset and drop the 
 - **Section rhythm:** 64-96px vertical gap.
 - **Card padding:** 24-32px. **Element gap:** 8-16px.
 - Heroes are big and left-aligned or split; avoid timid centered stacks for the main headline.
+- **Asymmetric content+aside grids:** default to a **2:1** column ratio (main:aside), not 3:1
+  -- 3:1 reads cramped on the aside column. Only widen toward 3:1 if the aside content is
+  genuinely minimal (a single short tag or icon).
 
-## The Dot Grid (signature background) -- use sparingly
+## The Dot Grid (signature grey-surface texture) -- use sparingly
 
-A field of small ink dots on a surface, evoking engineering/graph paper. It is a signature
-Sunshine texture -- powerful precisely because it is rare. Use it in AT MOST one or two places
-per page.
+A field of small ink dots on a **grey** surface, evoking engineering/graph paper. This texture
+is reserved exclusively for level-3 "aside" surfaces (see "Emphasis levels" above) --
+supporting info boxes, secondary callouts, side-column cards. It never sits on the
+electric-yellow hero surface or a dark/charcoal callout -- those two already carry their own
+weight and don't need a texture on top, and a dot pattern under text hurts readability if it's
+too dense. Use it in AT MOST one or two places per page.
 
 **When to use it:**
-- The footer (its canonical home).
-- One hero or CTA band as a backdrop behind bold type.
-- Occasionally a single feature/stat panel to make it stand out.
+- A grey "aside" card sitting next to the main content column (e.g. a "what would change
+  this" or "next action" box beside a recommendation).
+- A secondary/supporting callout that shouldn't compete with the page's one yellow hero moment
+  or a dark CTA band.
 
 **When NOT to use it:**
-- Never behind long body copy or tables (hurts readability).
+- Never on the electric-yellow surface, and never on a dark/charcoal surface -- grey only.
+- Never behind long body copy or tables (hurts readability even on grey).
 - Never on more than ~2 sections per page, and never two adjacent sections.
 - Not on small components (buttons, tags, cards under ~300px).
 
 **CSS -- dots via a single radial-gradient (drop-in):**
 ```css
-/* Ink dots on the electric-yellow surface (footer/CTA default) */
+/* Ink dots on a grey aside surface -- the ONLY approved dot-grid placement */
 .dot-grid {
-  background-color: var(--color-electric-yellow);
-  background-image: radial-gradient(circle, rgba(32,32,32,0.28) 1px, transparent 1.1px);
-  background-size: 17px 17px;      /* dot spacing; 12-20px reads well -- keep it fine, not chunky */
+  background-color: var(--color-light-gray);
+  background-image: radial-gradient(circle, rgba(32,32,32,0.32) 0.5px, transparent 0.6px);
+  background-size: 20px 20px;      /* dot spacing; ~20px keeps dots legible under text */
   background-position: 0 0;
 }
-/* Dots on a dark section: light dots on charcoal */
-.dot-grid--dark {
-  background-color: var(--color-charcoal);
-  background-image: radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1.1px);
-  background-size: 17px 17px;
-}
-/* Keep text legible: lay content over a solid inset panel when needed */
-.dot-grid .panel { background: var(--color-electric-yellow); }
+/* Keep text legible: prefer a solid inset panel on top of the grey dot field for dense text */
+.dot-grid .panel { background: var(--color-light-gray); }
 ```
-Tune `background-size` for density (bigger = sparser) and the alpha for subtlety. Keep the
-dots small and tight (~1px dot, ~17px spacing is the default) -- a larger/looser grid reads
-chunky and fights the fine engineering-paper texture that makes this signature work. Keep
-dots low-contrast so foreground type stays dominant.
+Keep the dot itself hairline (0.5px radius, transparent falloff at ~0.6px) and the spacing
+loose (~20px) -- a tighter 1px dot / 14px spacing recipe reads as a busier texture that fights
+with text sitting on top of it. Keep the alpha around 0.3-0.35 so foreground type stays
+dominant.
 
 ## The Retro Window Card (signature framed figure) — use for a single focal detail
 
@@ -363,6 +397,14 @@ Background `--color-paper-white` (or `--color-light-gray`), `border-radius: 2px`
 section a white card with a hard ink shadow is the workhorse container. (The shadow, not the
 border, is what should read as bold -- keep the outline a quiet 1px.)
 
+### Dark Callout
+**Role:** Level-2 emphasis (see "Emphasis levels") -- a genuinely major callout: a headline
+recommendation, a pull-quote, a single CTA band. Background `--color-charcoal`, text
+`--color-paper-white`, `border-radius: 2px`, border `1px solid var(--color-ink)`, generous
+padding (32-48px). **No dot-grid texture** -- the dark surface itself carries the weight;
+layering texture on top just fights the flat, confident-charcoal look. Use at most one per
+page.
+
 ### Retro Window Card
 **Role:** A single framed focal figure — highlight photo, diagram, screenshot, or a set-apart
 sidebar explanation. See "The Retro Window Card" section for full CSS + usage. Square box, 1px
@@ -406,9 +448,9 @@ beneath. Optionally one such band sits on the dot grid.
   and never let button text wrap (`white-space: nowrap`; verify at 375px).
 - Keep borders 1px by default; reserve 2px only for major band-to-band section dividers and a table's header rule.
 - Apply heavy negative letter-spacing to large headings (-2px to -6px) for the confident look.
-- Reserve the dot grid for whichever single band is already carrying yellow (hero or CTA, not
-  both, and not the footer by default -- see "Yellow usage discipline"); keep dots small and
-  low-contrast (~1px dot / ~17px spacing default).
+- Reserve the dot grid exclusively for grey level-3 aside surfaces (never yellow, never
+  dark/charcoal -- see "Emphasis levels" and "The Dot Grid"); keep dots hairline and loose
+  (~0.5px dot / ~20px spacing default).
 - Keep sky blue secondary -- code surfaces and quiet highlights only.
 - Use Phosphor Light-weight icons to add clarity at a glance (stats, comparison checks,
   callouts) -- see "Icons" section.
@@ -423,8 +465,8 @@ beneath. Optionally one such band sits on the dot grid.
 - Never set electric yellow as the default page/section background, never use it on more than
   one element per viewport, and never put ink/near-black text on a busy dot grid without a
   solid panel behind it.
-- Don't overuse the dot grid (at most the one band that's already yellow; never adjacent
-  sections; never behind body text/tables).
+- Don't overuse the dot grid, and never put it on yellow or dark/charcoal surfaces -- grey
+  aside boxes only; never adjacent sections; never behind body text/tables.
 - Don't introduce a third chromatic color -- the system is yellow + ink + one sky blue.
 - Don't render display or body text in the mono face (mono is for labels/tags/code), and don't
   set headings below weight 500.
@@ -438,7 +480,7 @@ beneath. Optionally one such band sits on the dot grid.
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
 | 1 | Paper White | `#ffffff` | THE default page background for most sections |
-| 2 | Neutral | `#f5f5f5` | The usual "alternate section" background (not yellow) |
+| 2 | Neutral | `#f5f5f5` | The usual "alternate section" background (not yellow); the only surface the dot-grid texture belongs on (aside/secondary callouts -- see "The Dot Grid") |
 | 3 | Yellow Accent | `#f0fb29` | RARE: one hero/header band, or one callout, or a single small tag/icon -- never more than one per viewport |
 | 4 | Charcoal | `#202020` | Dark sections / dark CTA fills (paper-white text) |
 | — | Border | `#202020` / `#222222` | Solid 1px borders (2px reserved for major dividers) and the shadow color |
@@ -447,9 +489,26 @@ beneath. Optionally one such band sits on the dot grid.
 ## Imagery
 Prefer bold, graphic visuals: high-contrast product shots on white cards (2px radius, hard
 shadow), Phosphor Light-weight icons in ink (never multicolor, never mixed weights), and the
-dot grid as texture on whichever single band is already the yellow moment. Keep image density
-moderate -- type and color do the heavy lifting. No soft drop shadows on images; if an image
-needs elevation, give it the flat hard-offset shadow like a card.
+dot grid as texture only on grey aside/callout surfaces (never yellow or charcoal -- see
+"Emphasis levels"). Keep image density moderate -- type and color do the heavy lifting. No soft
+drop shadows on images; if an image needs elevation, give it the flat hard-offset shadow like a
+card.
+
+**Section-lead images (a different treatment from the card above):** when an image sits at the
+top of a section as its lead visual -- not inside a card grid -- skip the border/shadow card
+treatment entirely. Let it sit directly on the page, constrained to its own column's width (not
+full-bleed across the section), and give it explicit top and bottom margin (e.g. 24px/32px) --
+a bare image doesn't get breathing room by default the way a padded card does, so set that
+margin intentionally or it reads cramped against surrounding text.
+
+**Custom illustration (via the nano-banana skill):** when a page needs a bespoke figure rather
+than a photo or icon -- a hero character, a diagram, a scene -- generate it with the nano-banana
+skill in a hand-drawn pen-and-ink line style with a light sci-fi bent: organic, slightly
+imperfect line quality (like a real pen sketch), never a clean vector/clip-art look. Request a
+plain white or transparent background so it drops cleanly onto any Sunshine surface; if the
+model returns visible background tint or stray artifacts, do a cleanup pass (flatten to pure
+white, patch stray marks) before locking the asset in as a reusable canonical version. Treat
+these illustrations as section-lead figures per the paragraph above -- no card border/box.
 
 ## Layout
 Max-width ~1200px on a paper-white canvas (yellow only where the "Yellow usage discipline"
@@ -459,9 +518,9 @@ nowrap`). Hero is oversized Sans 500 with heavy negative tracking, left-aligned 
 with a card/visual; a sharp primary + outline secondary button pair beneath (never let button
 labels wrap). Sections alternate white and light-gray card clusters, with the occasional
 charcoal band -- yellow appears at most once more on the page, in a single callout. Footer is
-a plain white/light-gray/charcoal band with mono labels -- NOT yellow with a dot grid by
-default (only make the footer the dot-grid band if nothing else on the page already used
-yellow). Generous 64-96px section rhythm.
+a plain white/light-gray/charcoal band with mono labels -- never yellow, and never dot-grid
+(dot-grid is reserved for grey aside/callout boxes, not full-width bands like the footer).
+Generous 64-96px section rhythm.
 
 ## Quick Start -- CSS Custom Properties
 

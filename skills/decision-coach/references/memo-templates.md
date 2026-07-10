@@ -17,16 +17,28 @@ Replace `[REPORT_FORMAT]` in the persona file with exactly this (adjust only the
 framing words in brackets to match that persona's own voice/lane if genuinely helpful — the six
 numbered fields and their order must not change):
 
+**Formatting requirement for every long-form field** (reasoning, unique_insight, risk_flagged,
+recommendation, believability_weighting_note, disagreements, adversarial_pass.content, option
+thesis, decision-info-row values): write it as 2-4 SHORT paragraphs separated by a blank line
+(`\n\n` in the JSON string), not one unbroken block. The site renders each field verbatim,
+splitting only on blank-line breaks — a field authored as one long paragraph renders as an
+unreadable wall of text on the page, regardless of how good the content is. A paragraph break
+belongs wherever the argument shifts beat (e.g. claim → evidence → implication), roughly every
+2-4 sentences. This applies when writing the panelist reports AND when Sunny coalesces them into
+the final memo fields — it is an authoring requirement, not just a rendering nicety.
+
 ```
 # Output format — use exactly this structure, nothing more
 
 1. **Headline stance** — one sentence. Where this lens lands.
 2. **The one insight only this lens catches** — the thing the other three panelists would
-   likely miss. If nothing distinct, say so plainly rather than padding.
+   likely miss. If nothing distinct, say so plainly rather than padding. 2-4 short paragraphs,
+   blank line between each — never one unbroken block.
 3. **Reasoning / evidence** — the actual argument. Cite real sources for any checkable claim;
    cite the specific framework/commitment/values-mapping being applied and why it's live here.
+   2-4 short paragraphs, blank line between each.
 4. **Risk or blind spot flagged** — the thing this lens sees as the biggest danger, even if
-   Devon or the other personas aren't naming it.
+   Devon or the other personas aren't naming it. Paragraph-break if it runs past 2-3 sentences.
 5. **Option-quality call, per option** — Bad / Good / Great / Best, one rating per surviving
    option, plus a one-line reason for each rating.
 6. **What would change this persona's mind** — the specific info or event that would flip
