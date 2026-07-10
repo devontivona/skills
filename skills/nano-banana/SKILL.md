@@ -67,6 +67,61 @@ restoration, multi-step visual stories). Read that file whenever the task is one
 - Text rendered inside images is best with `--model pro`.
 - Preview models (`-preview` suffixes) also exist; the GA aliases above are the safe defaults.
 - On refusal/no-image, the script prints the model's text explanation — read it, adjust the prompt.
+- The API does not support `--n` > 1 (multiple candidates) on this model — it errors with
+  "Multiple candidates is not enabled for this model." Loop the generate call once per
+  variation instead (see the base-character workflow below) rather than passing `--n`.
+- Nano Banana output has NO alpha channel — it's always a flat JPEG. A prompt asking for
+  "transparent background" will NOT produce real transparency; you'll get a background that's
+  merely plain-colored (e.g. white), not transparent. If true transparency is required, that's a
+  separate post-processing step (e.g. a background-removal tool) — don't rely on the prompt alone,
+  and say so plainly rather than claiming the output is transparent when it isn't.
+
+## CRITICAL: never batch a generate call and its send_image in the same tool-call block
+
+**This is the #1 real-world failure mode with this skill — read before your first call.**
+`bash` (running nanobanana.py) and `send_image` are NOT independent calls even though they look
+like separate tool invocations — `send_image` depends on the file the bash call just wrote to
+disk. Putting them in the same tool-call block (i.e. calling both in one turn) risks `send_image`
+firing before the generate call's file write has actually landed, especially over a slower
+network round-trip to the Gemini API. The result: `send_image` reports `"status":"delivered"` —
+looking completely successful — while the owner receives nothing, or receives a stale/empty file.
+This happened repeatedly in practice (multiple back-to-back failed sends) before being traced to
+this exact cause.
+
+**The fix — hard sequencing rule:** treat "generate the image" and "send the image" as a
+dependent chain, never as independent parallel calls:
+1. Call `bash` (nanobanana.py generate/edit) ALONE, wait for its result.
+2. Verify the file actually exists and is non-trivial before trusting it — e.g. `ls -la` the
+   output path and/or `file <path>` to confirm it's a real image, not a 0-byte placeholder. Don't
+   just trust the script's JSON "saved" output — confirm on disk in a separate step.
+3. ONLY THEN call `send_image` on the confirmed path, in its own turn (or at minimum after the
+   ls/file check has returned) — never bundled into the same block as the generate call.
+
+If sending multiple images, generate all of them first (sequentially or batched among
+themselves, since bash-to-bash has no such dependency), confirm each on disk, THEN send them —
+don't interleave generate/send/generate/send in a way that tempts batching a pair together.
+
+## Multi-pass consistency workflow (base character + variations)
+
+For a set of illustrations that need to share one consistent character/style (e.g. a mascot
+appearing in different scenes or a persona set for a site), don't independently prompt each one
+from scratch — text-only prompts drift in style across separate calls. Instead:
+
+1. **Base pass** — generate a handful of candidate versions of the base character/style alone
+   (no scene, no action), one at a time (see the `--n` gotcha above — loop individual calls, do
+   not pass `--n` > 1). Show them to the owner and lock in one as the canonical base.
+2. **Variation pass** — for each variant needed, use `edit` (not `generate`) with the locked-in
+   base image passed via `--image`, plus a text prompt describing what should change (a
+   different pose, a different small prop) while explicitly instructing the model to preserve
+   the established character design, line style, and palette. This anchors every variation to
+   the same visual identity instead of letting each one drift independently.
+3. **Action/scene pass** — if the action/scene is itself a further variation, either fold it into
+   step 2's edit prompt or do one more `edit` pass on the output of step 2, again passing the
+   prior image via `--image` so style continuity compounds forward rather than resetting.
+
+This costs more calls than one-shot generation per illustration, but is the reliable way to get
+a visually consistent set — much cheaper than discovering after the fact that four independently
+generated "personas" look like they came from four different artists.
 
 ## Going deeper
 

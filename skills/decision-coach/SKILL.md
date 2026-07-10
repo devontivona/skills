@@ -114,15 +114,27 @@ a real decision report, what do you need to know from Devon? List your specific 
 questions — the things that would materially change your analysis if you knew the answer. Don't
 ask questions you could answer yourself from what's already given."**
 
-Once all 4 report back, YOU combine their questions into one list for Devon:
+Once all 4 report back, YOU combine their questions into one list — but this is a LIST YOU
+HOLD, not a message you send in one shot:
 - De-duplicate ruthlessly — multiple personas often converge on the same underlying gap.
 - Group by topic, not by persona (Devon shouldn't have to mentally sort "which coach asked this").
 - Cut anything answerable from context already in the decision record.
-- Keep it batched and skimmable for iMessage — same "three at a time" instinct as brainstorm,
-  though a decision-coach round can reasonably run longer than 3 if the decision is genuinely
-  complex; use judgment, don't pad for padding's sake.
+- Order it roughly by leverage — the questions most likely to reshape the whole analysis first
+  (e.g. a first-principles "fulcrum" question that could collapse the decision) — since Devon
+  may not get through the whole list in one sitting, put the highest-value ones up front.
 
-Send Devon the combined list. Wait for his answers before round 2 — don't guess on his behalf.
+**Deliver it 3 questions per iMessage turn, not all at once — this is a hard rule, not a
+suggestion.** Over iMessage Devon cannot hold a dozen-plus questions in working memory in a
+single turn; dumping the full combined list in one message defeats the entire point of having
+asked good questions; the medium is exactly this constraint (see SUNNY.md on iMessage norms —
+same reasoning that governs brainstorm's "three at a time"). Send the first 3, let him answer
+(in whatever order/depth he wants), then send the next 3, and so on, until the list is worked
+through. Track which questions are answered vs. still pending yourself — don't make Devon do
+that bookkeeping, and don't re-send an already-answered question in a later batch. If Devon
+answers several at once or answers something out of order, just re-sort your pending queue and
+keep going. Only start round 2 once the full list is actually worked through (or Devon
+explicitly says he's answered enough) — don't quietly drop unanswered questions to wrap up
+faster.
 
 ## 4. Round 2 — full decision reports (fan out again, fresh context)
 
