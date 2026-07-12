@@ -17,7 +17,7 @@ style preference. Ask only what you genuinely need — infer the rest.
 
 ## 2. Pick a design style
 
-Styles live next to this skill in assets/styles/ (i.e. ~/.sunny/skills/website-builder/assets/styles/).
+Styles live next to this skill in assets/styles/ (i.e. ~/.sunny/skills/authored/skills/website-builder/assets/styles/).
 
 - Read assets/styles/INDEX.md first — it is one line per style.
 - If the owner named or implied a style, use it. Otherwise recommend one and say why in a sentence.
@@ -142,7 +142,7 @@ handing off:
 CHROME=$(find ~/.cache/puppeteer -name chrome -type f -executable | head -1)
 for w in 375 834 1440; do
   "$CHROME" --headless --no-sandbox --disable-gpu \
-    --window-size=${w},1200 --screenshot=/tmp/check-${w}.png \
+    --window-size=${w},1200 --screenshot="$HOME/.sunny/scratch/check-${w}.png" \
     --run-all-compositor-stages-before-draw --virtual-time-budget=3000 \
     "https://<your-devbox-url>"
 done

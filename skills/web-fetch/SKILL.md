@@ -78,8 +78,8 @@ result gets used downstream.
 
 **trafilatura** (required for tier 1 — install once per box):
 ```
-curl -sL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-python3 /tmp/get-pip.py --user
+curl -sL https://bootstrap.pypa.io/get-pip.py -o ~/.sunny/scratch/get-pip.py
+python3 ~/.sunny/scratch/get-pip.py --user
 ~/.local/bin/pip3 install trafilatura --user
 ```
 This box has no system pip/ensurepip/venv and no sudo (`apt install python3-pip`

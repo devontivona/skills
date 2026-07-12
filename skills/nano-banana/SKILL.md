@@ -16,7 +16,7 @@ per image. Every image is saved with a sidecar `.txt` recording the model + prom
   ALWAYS run via the bash `credentials` map — never paste the key:
 
       bash(
-        command: 'NANOBANANA_API_KEY="$K" python3 ~/.sunny/skills/authored/nano-banana/scripts/nanobanana.py generate --prompt "..." --out ~/work/out.png',
+        command: 'NANOBANANA_API_KEY="$K" python3 ~/.sunny/skills/authored/skills/nano-banana/scripts/nanobanana.py generate --prompt "..." --out ~/.sunny/scratch/out.png',
         credentials: { K: "gemini-api-key" }
       )
 
@@ -39,7 +39,8 @@ full model name. Override default with env `NANOBANANA_MODEL`.
     # Edit / restore / compose (feed one or more input images)
     nanobanana.py edit --prompt "<instruction>" --image in.png [in2.png ...] [--out path] [--model ...]
 
-- `--out` defaults to `image.png` / `edited.png` in the CWD. The REAL saved extension matches the
+- Always pass `--out` under `~/.sunny/scratch/` (working images; send_image before GC takes them).
+  Without it the script drops `image.png` / `edited.png` in the CWD. The REAL saved extension matches the
   returned format (usually `.jpg`) — read the JSON `saved` array the script prints for actual paths.
 - `--ref` on generate = style/subject reference images (not edited, used as guidance).
 - `--n` returns multiple variations (suffixed `-1`, `-2`, …).

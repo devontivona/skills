@@ -85,8 +85,8 @@ person (e.g. `kate`); their config dir will be `~/.config/gws-<handle>`:
 2. Background the login so it prints its URL and waits on its callback port:
 
        GOOGLE_WORKSPACE_CLI_CONFIG_DIR=~/.config/gws-<handle> \
-         nohup bash -c 'gws auth login -s calendar,drive,tasks > /tmp/gwslogin.out 2>&1' & 
-       sleep 6 && cat /tmp/gwslogin.out      # grab the printed accounts.google.com URL + its localhost:PORT
+         nohup bash -c 'gws auth login -s calendar,drive,tasks > ~/.sunny/scratch/gwslogin.out 2>&1' & 
+       sleep 6 && cat ~/.sunny/scratch/gwslogin.out      # grab the printed accounts.google.com URL + its localhost:PORT
 
 3. Send the URL to the user (iPad/no-shell is fine). They sign in as the RIGHT account,
    approve scopes, and land on a "Safari can't connect to localhost" page — that's
@@ -115,7 +115,7 @@ GOTCHAS learned:
   not have required permission to use project". Grant it as the project owner:
   `gcloud projects add-iam-policy-binding <project> --member="user:<email>" --role="roles/serviceusage.serviceUsageConsumer"` (propagation ~1 min).
 - gcloud's OWN headless login (for the project owner) uses a different relay: 
-  `mkfifo /tmp/f; (exec 3<>/tmp/f; gcloud auth login <email> --no-launch-browser --update-adc <&3 &)` then write the pasted verification code into the fifo. gcloud is only needed for
+  `mkfifo ~/.sunny/scratch/gcloud-fifo; (exec 3<>~/.sunny/scratch/gcloud-fifo; gcloud auth login <email> --no-launch-browser --update-adc <&3 &)` then write the pasted verification code into the fifo. gcloud is only needed for
   project/API admin, not for gws runtime.
 
 ## Scopes & the consent screen
