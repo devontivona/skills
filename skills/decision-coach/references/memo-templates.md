@@ -80,6 +80,9 @@ the final memo fields — it is an authoring requirement, not just a rendering n
   "status": "open | decided | superseded",
   "decided_date": "ISO date or null",
   "superseded_by": "memo id or null",
+  "chosen_option": "string matching an option name, or null until decided",
+  "decision_rationale": "1-2 sentences, in Devon's own reasoning, on why he picked that option — or null until decided. Especially important to fill in when the choice diverges from the panel's aggregated recommendation.",
+  "overrode_panel": "true | false | null — whether chosen_option goes against the panel's aggregated recommendation. Set explicitly at decide-time; don't leave it to the reader to infer.",
 
   "decision_question": "string",
   "context": "string",

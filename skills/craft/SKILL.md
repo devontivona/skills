@@ -185,6 +185,24 @@ right) — this bug was hit twice in a row before catching it via a direct read-
 including once via a "delete and redo" attempt that reproduced the exact same bug
 instead of fixing it. Slow down on multi-line task content specifically.
 
+## Gotcha: marking a parent task done HIDES its open sub-tasks from Devon (2026-07-12)
+
+If a task block has been promoted to a page with its own child tasks (see the "Gotcha:
+`tasks add --markdown` splits on newlines" section above for one way this happens, or any
+task with nested sub-items), **marking the PARENT task done removes it from every active
+task view** — and its still-open children go with it. Devon will never see those child
+tasks in his UI again; they're not surfaced anywhere once the parent is done, even though
+they're individually still `[ ]`/incomplete underneath.
+
+Concretely: don't mark a parent task `done` unless the actual real-world thing it
+represents is FULLY resolved, including anything nested under it — not just "the part I
+personally checked is done." (Hit exactly this 2026-07-12: closed "Check on my HSA
+transfer" after confirming one of Devon's two HSA transfers had completed, without
+realizing/checking there was a second, separate transfer still pending — that second one
+promptly vanished from his task list along with the parent.) When in doubt, or when a task
+covers multiple sub-parts, verify ALL of them are done before flipping the parent's state,
+or leave the parent open with a status note listing what's done vs. still pending.
+
 ## Tag taxonomy rules (set by Devon, 2026-07-06 — read carefully)
 
 - **Devon does NOT use Craft as a "read it later" app.** `#resources/reads` and
@@ -246,7 +264,7 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
    distinct `#resources/<category>` string seen (excluding the deprecated `reads`/
    `watch`, which should never be reapplied even if seen). This is the reuse-first
    candidate set for step 5.
-2. **Load state**: read `~/.sunny/state/craft-resource-tagger.json` (JSON:
+2. **Load state**: read `~/.sunny/data/craft-resource-tagger.json` (JSON:
    `{"processed": ["<rootBlockId>", ...]}`). Create it (`{"processed": []}`) if
    missing. This is a **performance cache only** — it lets you skip re-fetching docs
    you already know are done without re-checking Craft every time. It is NOT the
@@ -319,7 +337,7 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
   `#resources/*` tags present in its actual content, zero results for it in search).
   **Never trust a `search` count as a real count of anything** — always verify
   specific documents via `blocks get <rootBlockId>` directly when you need ground
-  truth, and treat the local state-file cache (`~/.sunny/state/craft-resource-
+  truth, and treat the local state-file cache (`~/.sunny/data/craft-resource-
   tagger.json`) as the more reliable fast-path signal for "have I already touched
   this doc," not search.
 - Tag and description blocks are always **added**, never used to edit/replace

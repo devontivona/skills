@@ -185,10 +185,10 @@ shouldn't be doing on your behalf.
 ## 6. Publish
 
 - Write the memo as one JSON file per the schema in `references/memo-templates.md`, into
-  `~/.sunny/sites/decisions/data/memos/<slug>.json` (slug = kebab-case of the decision
+  `~/.sunny/data/sites/decisions/data/memos/<slug>.json` (slug = kebab-case of the decision
   question, short — e.g. `financial-advisor-2026`).
 - The site (a devbox project named `decisions`, static HTML + a small server reading the JSON
-  directory — see the site's own README in `~/.sunny/sites/decisions/`) picks up new/updated
+  directory — see the site's own README in `~/.sunny/data/sites/decisions/`) picks up new/updated
   memo files automatically; no rebuild step needed beyond writing the file.
 - Confirm the memo is live: `curl -sI https://decisions.waywardlane.com` and check the index
   lists the new memo, then send Devon the direct memo URL (not just the index) in your reply.
@@ -202,6 +202,11 @@ shouldn't be doing on your behalf.
   emerges). Bump `updated`.
 - **Mark `Decided (date)` when Devon actually commits** — set `status: "decided"` and
   `decided_date`. From that point, the memo is a historical record — don't silently rewrite it.
+  Also set `chosen_option` (must match one of the `options[].name` values) and
+  `decision_rationale` — 1-2 sentences in Devon's own words on why he picked it. Set
+  `overrode_panel: true` when `chosen_option` goes against the panel's aggregated
+  recommendation (`option_quality_verdict`) — this is the case the rationale matters most,
+  so don't skip it just because Devon's reasoning was brief.
 - **Reversing a decided call = a NEW memo**, never an edit to the old one. Set the new memo's
   content, then go back and set the OLD memo's `status: "superseded"` and `superseded_by` to
   the new memo's id, so the index shows the lineage. This preserves the actual decision

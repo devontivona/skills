@@ -71,7 +71,7 @@ by not thinking about it.
 
 ## 4. Write it to disk
 
-Write to a working directory under the runtime home, e.g. ~/.sunny/sites/<slug>/index.html
+Write to a working directory under the runtime home, e.g. ~/.sunny/data/sites/<slug>/index.html
 (create the folder). One file is enough; add an assets/ subfolder only for real images you have.
 
 ## 5. Host it with devbox
