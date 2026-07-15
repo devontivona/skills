@@ -9,6 +9,10 @@ A thin, scriptable wrapper over Google's Nano Banana image models — the same e
 official Gemini CLI extension, minus the interactive REPL. Deterministic, fast, one shell call
 per image. Every image is saved with a sidecar `.txt` recording the model + prompt (reproducibility).
 
+> NOTE (unified-voice-layer, 2026-07-15): only conversations hold send_image. In a
+> scheduled run or subagent, put the FINAL image path in your report instead — the
+> conversation relays it and sends the image itself.
+
 ## Setup (already done, verify if it breaks)
 
 - Script: `scripts/nanobanana.py` (Python 3 stdlib only — no pip installs).

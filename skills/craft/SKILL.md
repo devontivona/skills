@@ -232,13 +232,31 @@ or leave the parent open with a status note listing what's done vs. still pendin
 
 ## The `#sunny` marker tag — how "already processed" is tracked
 
-Every document the job evaluates gets a **`#sunny`** tag added (alongside whatever
-`#resources/*` tags apply, or alone if the doc isn't a resource at all). This is the
-authoritative "AI has already looked at this document" signal — visible to Devon in
-Craft, and durable even if the local state-file cache is lost or reset (see Job
-procedure below). **A document that already contains `#sunny` in its content should
-never be re-evaluated** — that's the actual skip condition, checked by reading each
-candidate's content, not by trusting a local file alone.
+**Two-tier system, deliberately, not redundant sources fighting each other:**
+- **The cache (`~/.sunny/data/craft-resource-tagger.json`) is the fast path.** A
+  cache-hit means skip immediately — do not even fetch the document's content. This
+  is what makes daily runs cheap once the space is mostly processed.
+- **The `#sunny` tag in the document's own content is the durable, self-healing
+  fallback**, consulted ONLY on a cache miss. It's what survives a lost/reset cache
+  (this is why it exists: `#sunny` was introduced specifically because a local file
+  alone isn't durable). Visible to Devon in Craft too.
+
+**Do NOT collapse this to one mechanism.** Cache-only breaks catastrophically on any
+cache loss (silently re-tags the whole space with no way to tell what's done — the
+literal failure mode `#sunny` was added to prevent). Tag-only works but means a full
+content-fetch of every document, every single day, forever. Keep both, but keep the
+order strict: cache first (skip, no read at all), `#sunny`-in-content second (skip,
+but only discovered because you had to read the doc anyway on a cache miss).
+
+**On a cache miss, checking `#sunny` is a hard, mechanical, unconditional stop —
+not a judgment call.** The instant a fetched candidate's content contains the literal
+string `#sunny`, in this exact order: (1) add its rootBlockId to the cache, (2) write
+the cache file to disk immediately — do not batch this particular write for later —
+(3) move to the next candidate. Do NOT evaluate whether the existing tags "look right,"
+do NOT re-describe, re-title, or touch the doc in any way. This exact gate failing to
+fire (mid-batch, some run) is what caused a real duplicate-tag incident on 2026-07-11 —
+treat this as the single most important rule in this job, checked before any other
+action on every candidate, no exceptions for a "quick fix" or "this one looks off."
 
 Because this signal didn't exist before 2026-07-06, the **first several runs of this
 job function as a backfill pass**: every existing `#resources/*`-tagged document from
@@ -277,9 +295,12 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
 4. **Per candidate** (cap per run — 20 for a test run, ~50 for a normal daily run;
    leftovers just roll into the next run since they're still uncached):
    - `blocks get <rootBlockId> --format markdown` (or `--format json` if you need
-     block ids, e.g. to fix a deprecated tag). **If the content already contains
-     `#sunny`, stop here — add to processed cache and move on. Do not re-tag, re-
-     describe, or re-title.**
+     block ids, e.g. to fix a deprecated tag). **This fetch's FIRST purpose is the
+     `#sunny` check, before you even look at the doc's subject matter.** If the
+     content already contains `#sunny`: add to the cache, persist the cache file to
+     disk right now (this specific candidate, not batched with others), and move on
+     to the next candidate. Do not re-tag, re-describe, re-title, or take any other
+     action on this doc — see the hard-gate rule in the `#sunny` section above.
    - Otherwise, find the actual external link in the doc (usually a `richUrl` block
      near the top) and **fetch it via `skill:web-fetch`** (see the Connection section
      above) to read the real page content — do not judge, tag, or describe from the
@@ -309,11 +330,43 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
         that only the title changed and the content children are intact before
         relying on it for the rest of the batch.** Leave titles alone if they're
         already reasonably clean.
-     d. Append a final tag block: all applicable `#resources/<category>` tags plus
-        `#sunny` in one block, e.g. `#resources/repos #resources/ai #sunny`
-        (`--position end`).
-   - **If it's not a resource:** just append `#sunny` alone (`--position end`) so
-     it's marked reviewed and never re-nagged. Don't invent a tag for it.
+     d. **Write the final tag block via tag-level merge, not blind append.** Before
+        writing, scan the doc's existing content (from the `--format json` fetch)
+        for every block containing a job-owned tag token (`#resources/*` or
+        `#sunny`) — this covers the normal "no tags yet" case (zero such blocks)
+        AND the backfill case (a pre-existing `#resources/*` block with no `#sunny`
+        yet, since that's exactly why it's a candidate at all). For each such block
+        found:
+        - Split its markdown into whitespace-separated tokens.
+        - Classify every token starting with `#`: **job-owned**
+          (`#resources/*` or `#sunny`) vs. **foreign** (`#gifts/*`, `#pdx`, or
+          anything else) — a block is Craft's paragraph unit, so foreign and
+          job-owned tags can genuinely coexist in the same block. Foreign tokens
+          are carried forward verbatim, no matter which block they came from.
+        - Discard the job-owned tokens found (they're superseded by the freshly
+          decided set below) — EXCEPT do not silently drop information: if a
+          deprecated `reads`/`watch` tag is among them, that's the taxonomy fix
+          already described above, not data loss.
+        Compute the final job-owned set = (freshly-decided `#resources/<category>`
+        tags from step a) ∪ `#sunny`. Combine: all foreign tokens collected above +
+        the final job-owned set, into ONE block's markdown.
+        - If exactly one job-owned-tag block existed: `blocks update --id <thatBlockId>
+          --markdown "<merged>"` in place.
+        - If zero existed: `blocks add ... --position end` with the merged content
+          (this is just the normal fresh-tag case).
+        - If more than one existed (the duplicate-block bug's aftermath, or any
+          other reason): update ONE of them to the merged content and `blocks
+          delete --id <blockId>` the rest — never leave two job-owned-tag blocks
+          standing.
+        This makes the write idempotent: even if the `#sunny` skip-gate somehow
+        fails to fire on some future candidate, re-running this merge on an
+        already-fully-tagged doc computes the same tag set and either no-ops or
+        collapses duplicates, instead of creating a new one. (This is the fix for
+        the exact bug hit in practice 2026-07-11 — see Notes below.)
+   - **If it's not a resource:** same tag-level merge as step (d) above, but the
+     final job-owned set is just `{#sunny}` alone (no `#resources/*` tag invented).
+     Any foreign tags (`#gifts/*`, `#pdx`, etc.) already on the doc are preserved
+     exactly the same way.
    - Add the doc's `rootBlockId` to the state file's `processed` cache either way and
      persist the file every few docs (so a crash/timeout mid-run doesn't lose
      progress on the fast-path cache — though as noted, correctness doesn't depend
@@ -340,10 +393,13 @@ either way. Runs daily via a schedule AND is safe to run ad-hoc as a one-off/tes
   truth, and treat the local state-file cache (`~/.sunny/data/craft-resource-
   tagger.json`) as the more reliable fast-path signal for "have I already touched
   this doc," not search.
-- Tag and description blocks are always **added**, never used to edit/replace
-  existing content — with the one narrow, explicit exception of fixing a deprecated
-  `reads`/`watch` tag block (see tag taxonomy section) and the title-cleanup step
-  (which edits ONLY the root page block's title text, never its content children).
+- Tag blocks are handled via the **tag-level merge** described in step 4d — this is
+  an explicit, narrow exception to a general append-only posture: an existing
+  job-owned-tag block gets edited/consolidated in place (preserving any foreign
+  tags found within it), never blindly duplicated. The description block remains
+  add-only (always a new block near the top), as does the one other existing
+  exception (fixing a deprecated `reads`/`watch` tag) and the title-cleanup step
+  (edits ONLY the root page block's title text, never its content children).
 - Currently scoped to `--location unsorted` only. Daily notes sometimes contain
   single-link clips too, but are treated as journal space — extending this job to
   daily notes needs an explicit go-ahead from Devon first.

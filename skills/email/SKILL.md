@@ -64,10 +64,26 @@ email contents without the owner's go-ahead.
 
 ## Replying on an existing thread (threaded, saved as draft — not sent)
 
+**Before drafting ANY reply on an existing thread — always pull the FULL thread first,
+not just the one message that prompted the reply.** Search by subject (or list the
+sender/recipient's recent mail) across BOTH `INBOX` and `[Gmail]/All Mail`, then read
+every message in the thread in order, not just the latest one. Missed this once
+(2026-07-14): replied to a scheduling thread using only the message the owner pointed
+to, without checking whether another CC'd participant had already replied with a
+different proposal — the reply landed in conflict with a message already on the thread.
+A single-message read is not enough context to draft a reply that accounts for
+everyone else who's already weighed in.
+
+To find the whole thread: `himalaya envelope list -a <account> -f "[Gmail]/All Mail" -s 20 -- subject "<word1>"`
+(quote multi-word subjects fail to parse — see gotcha below; search on one distinctive
+word from the subject, or `from`/`to` on a known participant, and skim dates/subjects to
+assemble the thread yourself).
+
 To draft a reply that's properly threaded (correct `In-Reply-To`, quoted original) without
 sending it — e.g. "find that thread and draft a reply, I'll send it myself":
 
-1. Find the message to reply to (search as above; check `[Gmail]/All Mail` if needed).
+1. Find the message to reply to (search as above; check `[Gmail]/All Mail` if needed) —
+   AND read the rest of the thread per the rule above before drafting.
 2. Generate a threaded template to see the correct headers/quoting:
    `himalaya template reply -a <account> -A <id> -f <folder>` (`-A` = reply-all, includes
    original Cc list; drop it for reply-to-sender-only).
@@ -84,6 +100,11 @@ This is the right flow whenever the owner wants to review/send it themselves rat
 Sunny send on their behalf.
 
 ## Sending (acts as whoever owns the account — confirm first)
+
+**The "pull the full thread first" rule above applies here too, not just to drafts** — this is
+where the 2026-07-14 miss actually happened (a reply sent on Devon's behalf, not just drafted).
+Before sending ANY reply on an existing thread, read the whole thread, not just the message the
+owner pointed to.
 
 Sending speaks AS the account holder, so confirm the recipient, subject, and body with the owner
 in your reply BEFORE sending on someone else's account (Devon's, or a future family member's)
