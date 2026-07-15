@@ -1,6 +1,6 @@
 ---
 name: task-assistant
-description: Daily personal task-assistant job — investigate and complete/unblock Devon's open personal Craft tasks (Task Inbox + any doc with open tasks, excluding Icebox and Craft's own onboarding/template docs), track per-task nudge history so it never repeats a stale suggestion, and produce a morning iMessage summary. Triggered by a 7am PT standing schedule; also usable ad hoc if Devon asks to check on his personal tasks or task inbox.
+description: Daily personal task-assistant job — investigate and complete/unblock Devon's open personal Craft tasks (Task Inbox + any doc with open tasks, excluding Icebox and Craft's own onboarding/template docs), track per-task nudge history so it never repeats a stale suggestion, and report a morning summary to Sunny (who relays it to Devon). Triggered by a 7am PT standing schedule; also usable ad hoc if Devon asks to check on his personal tasks or task inbox.
 ---
 
 # Task Assistant — daily personal-task pass
@@ -14,6 +14,17 @@ and writing findings into the task, and leave everything else alone with a light
 
 Read `skill:craft` first for the Craft MCP mechanics (the `craft_mcp.py` helper, task syntax,
 block nesting). This skill is the *procedure*; craft is the *plumbing*.
+
+Read `skill:email` for the himalaya CLI mechanics if any task needs an inbox check (e.g. the
+HSA-transfer task, or anything else needing a status check against Devon's or Sunny's mail).
+**Email access works fine in this scheduled run** — the standing schedule's authority includes
+both `bash` and `credentials`, exactly what's needed to inject the account credential
+(`HIMALAYA_PASSWORD_DEVON` via the `email-devon` credential, per skill:email) and run himalaya,
+identical to any live conversation. A 2026-07-15 run incorrectly reported "Devon's IMAP keyring
+isn't loaded in the scheduled context" and skipped an email check on that basis — that claim was
+wrong (verified live the same day: the exact same credential injection worked with no changes).
+Don't repeat that excuse; if an email check is needed for a task, just do it the normal
+skill:email way.
 
 ## Scope — what's in, what's out
 
@@ -148,14 +159,14 @@ Rules for using it:
 4. For each remaining in-scope open task: bucket it (see above), take action per the autonomy
    line, and update its history entry.
 5. Write the updated history file back.
-6. Compose the morning message — see format below — and send it via `send_message` (this job
-   is triggered by a schedule delivering to Devon directly, so just reply normally when it fires).
+6. End with the morning report — see format below. You are reporting TO SUNNY, who relays
+   the summary to Devon in Sunny's own voice; never address Devon or write as Sunny.
 
-## Message format
+## Report format
 
-Three short parts, iMessage-appropriate (concise, plain text, no markdown headers):
+Three short parts (facts for Sunny to relay, not finished prose for Devon):
 
-**(a) What I did** — 1-4 bullets of real completed/unblocked work from this run. Skip this
+**(a) What this run did** — 1-4 bullets of real completed/unblocked work from this run. Skip this
 section entirely if nothing happened (e.g. everything's already been nudged out or is waiting
 on Devon). Be concrete: "Booked nothing, but shortlisted 3 hotels for Shannon & Austin's wedding
 weekend — [link/names] — want me to hold one?" beats "worked on hotel task."
@@ -169,8 +180,8 @@ min tonight or tomorrow morning" rather than a full task list. Usually 1-2 items
 tasks nearing/at staleness thresholds, overdue-and-unactioned items, or anything you unblocked
 this run that's now trivial for him to finish. Never repeat an already-2x-nudged item here.
 
-Keep the whole message to a few short texts, per Sunny's general iMessage style — this is a
-digest, not a status report dump.
+Keep the whole report compact — a digest Sunny can relay in a few short texts, not a status
+dump.
 
 ## Don'ts
 

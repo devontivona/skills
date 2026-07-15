@@ -1,6 +1,6 @@
 ---
 name: heartbeat
-description: The recurring heartbeat job — every 3h from 9am-9pm, sweep four sources (Sunny's own unarchived email, Devon's unarchived email, Devon's Craft task list, Sunny's memory files) and take up to 3 small autonomous actions plus surface up to 2 things for Devon to weigh in on, in one short chief-of-staff style iMessage. Distinct from skill:task-assistant (that's a once-daily, task-list-only, deeper pass) — this is a lighter, higher-frequency pulse across a wider set of inputs. Triggered by the "heartbeat" standing schedule; not normally run ad hoc.
+description: The recurring heartbeat job — every 3h from 9am-9pm, sweep four sources (Sunny's own unarchived email, Devon's unarchived email, Devon's Craft task list, Sunny's memory files) take up to 3 small autonomous actions, and report to Sunny (who relays to Devon) up to 2 things needing his call. Distinct from skill:task-assistant (that's a once-daily, task-list-only, deeper pass) — this is a lighter, higher-frequency pulse across a wider set of inputs. Triggered by the "heartbeat" standing schedule; not normally run ad hoc.
 ---
 
 # Heartbeat — 3-hourly chief-of-staff pulse
@@ -72,23 +72,18 @@ Per-source autonomy split:
   memory reminds you of an unresolved celebration-image choice → that could become its own
   short discussion item, not tied to email or Craft at all).
 
-## Step 3 — compose ONE message, chief-of-staff tone
+## Step 3 — compose ONE report, addressed to Sunny
 
-Short, warm, direct — iMessage norms, no markdown, no headers, no bullet-dump. Model it on:
+You are reporting to Sunny, who will decide what to tell Devon and say it in Sunny's own
+voice inside the live conversation. Report facts, not prose for Devon:
 
-> "Hey Devon, a few things for you this afternoon. I drafted a reply to Debbie in your
-> inbox, feel free to take a look and send it. Also, I just wanted to check in — did you
-> still want to get that car detailing scheduled? If so, just let me know who you wanted to
-> work with and I'll get it booked."
+- What you DID this cycle (concrete: "drafted a reply to Debbie, sitting in Devon's drafts").
+- What needs DEVON'S call (each phrased so Sunny can ask him in one line).
+- Suggested emphasis: which one thing matters most right now, if any.
 
-**Never say "heartbeat," "pulse," "cycle," "this run," or otherwise name the mechanism
-behind this message.** "Heartbeat" is an internal/implementation concept only — the whole
-point is that Devon experiences an always-on, proactive chief of staff, not a scheduled job
-checking in. Just open with what you're actually bringing him ("Hey Devon, a couple things
-for you—" or similar), never "quick heartbeat pass" or "just did my periodic check."
-
-Lead with what you actually did (if anything), then what you're asking (if anything). Skip
-a category entirely if it's empty rather than saying "nothing to report on X."
+Skip a category entirely if it's empty rather than writing "nothing on X." Never address
+Devon, never write in first person as Sunny — Sunny composes the message. (The old
+chief-of-staff voice guidance now applies to SUNNY's relay, not to you.)
 
 **If there is truly nothing — zero autonomous actions taken and zero discussion items after
 checking all four sources — respond with exactly `<no-report/>` and nothing else.** A silent
