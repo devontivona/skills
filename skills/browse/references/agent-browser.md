@@ -134,6 +134,61 @@ Rules for credentials in every case:
 - Once a session is seeded/saved, later runs reuse it — you should not need the credential again
   unless the session expires.
 
+## Stealth / anti-bot (MANDATORY for every launch — not optional, not just for "bot-heavy" sites)
+
+Default headless agent-browser leaks `navigator.webdriver=true` and a "HeadlessChrome" UA, which
+trips Cloudflare / Reddit / DataDome / similar defenses — sites that otherwise work fine will
+serve a block page, a JS challenge, or silently degrade (e.g. Google's `/sorry/` page, Reddit's
+`js_challenge` redirect). This is not a niche edge case — it hits ordinary browsing on major
+sites, so treat every launch as needing it, credentialed or not.
+
+**The canonical launch — use this exact form every time, no shortcuts:**
+
+```bash
+xvfb-run -a --server-args="-screen 0 1920x1080x24" \
+  agent-browser --headed --init-script ~/.sunny/browse-stealth/stealth.js open <url>
+```
+
+- `~/.sunny/browse-stealth/stealth.js` masks `navigator.webdriver` (patched on the prototype so
+  own-props stay empty), strips "Headless" from the UA, adds `chrome.runtime`, and fixes
+  permissions queries. Verified against the full rebrowser detector suite (all green: webdriver
+  false, clean Chrome UA + userAgentData brands, no CDP/Runtime.Enable leak) — in BOTH research
+  and credentialed (`--profile`) modes.
+- `--headed` is REQUIRED alongside the init script — a full headless launch (no `--headed`) uses
+  a different code path that still leaks headless signals even with the init script loaded.
+  Never drop `--headed` "to save time"; both pieces are necessary together, not independently
+  sufficient.
+- `xvfb-run` (or a manually-started `Xvfb :99` with `export DISPLAY=:99`) is required because
+  `--headed` needs a real X display; the bash tool runs non-interactive so there is no display
+  by default. Not optional — omitting it makes `--headed` fail outright ("Missing X server or
+  $DISPLAY", Chrome exits immediately).
+- These flags are NOT persisted via shell rc — each bash call is a fresh non-interactive shell,
+  so pass the full canonical command on every launch in every call, not just the first one in a
+  session.
+
+**Gotcha: a running daemon silently ignores new launch flags.** agent-browser keeps a background
+daemon alive between commands for speed. If that daemon is already running from an earlier
+headless (or plain) launch, passing `--headed` or `--init-script` on a later command does
+**nothing** — you'll see `⚠ --headed ignored: daemon already running` (easy to miss in output)
+and Chrome will still be the old headless instance. `agent-browser close --all` closes
+sessions/tabs, NOT the daemon — it will not fix this. To force a clean relaunch with new flags:
+
+```bash
+pkill -9 -f "agent-browser-linux"
+pkill -9 -f "chrome.*agent-browser-chrome"
+# then relaunch fresh with the full canonical command above
+```
+
+If a launch behaves oddly (unexpected block pages, Chrome exits with "Missing X server", flags
+seem ignored), check for a stale daemon/Xvfb process before assuming it's a site-side issue.
+
+**Root-cause note (2026-07-15):** this section didn't exist until a live task partially skipped
+stealth (used `--init-script` without `--headed` in some calls, and one call with neither) and
+hit Reddit's `js_challenge` block as a result. The setup had previously only been described in a
+memory topic doc, which claimed it was "documented in the skill" when it actually wasn't — so it
+was possible to have the browse skill loaded and still not see the requirement. It now lives here
+so that can't happen again.
+
 ## Fallback engine: Playwright (deterministic scripted flows)
 
 agent-browser is the default. For flows needing a deterministic, scripted approach — the

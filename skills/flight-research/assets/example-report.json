@@ -1,0 +1,76 @@
+{
+  "id": "sfo-tokyo-nov2026",
+  "created": "2026-07-18",
+  "updated": "2026-07-18",
+  "status": "complete",
+  "title": "San Francisco → Tokyo — late November 2026",
+  "route_summary": "SFO ⇄ NRT · round-trip",
+  "example_notice": "This is a baked-in EXAMPLE report with fictional data (a made-up SFO→Tokyo search) shipped so the site always has something to show. Not a real Devon trip.",
+
+  "search_params": [
+    { "label": "Route(s)", "value": "SFO ⇄ Tokyo NRT — round-trip (open-jaw NRT-in / HND-out also checked)" },
+    { "label": "Dates searched", "value": "Flexible window: depart Nov 20–23, return Nov 30–Dec 3 2026 (date-matrix swept)" },
+    { "label": "Travelers", "value": "4 travelers — 2 adults + 2 adults" },
+    { "label": "Cabins", "value": "2 economy + 2 business (mixed; business confirmed as a hard requirement for the 2 premium travelers)" },
+    { "label": "Markets tried", "value": "US (departure), JP (destination)" }
+  ],
+
+  "recommendation": "Book the round-trip SFO⇄NRT: ANA nonstop for the 2 business travelers (~$4,180/seat via Ignav, matched within $40 on Google Flights) and United/ZIPAIR for the 2 economy travelers (~$690/seat).\n\nSkip the positioning-flight play — the modeled saving (~$430/business seat) is well under Devon's $1,000 business-class threshold, and it isn't worth the separate-ticket risk on a 4-person family trip.\n\nStrongly consider burning miles for the two business seats instead of cash: Seats.aero shows Qantas/Aeroplan award space at ~167k miles + ~$366 taxes per J seat on Nov 22 — that's dramatically better value than the ~$4,180 cash fare if the miles are available.",
+  "recommendation_reasoning": "Cash business is genuinely expensive this window and the cheapest cash source (Ignav) only undercut Google Flights by ~$40 — no meaningful cash arbitrage between the two markets tried.\n\nThe award layer is where the real money is: two J seats at 167k miles each is the classic premium-cabin points-crush-cash case, and it fits Devon's transferable-points profile. The catch is award space is volatile — it must be grabbed fast, so treat it as a 'decide now' option rather than something to sit on.\n\nOpen-jaw (NRT-in / HND-out) came in essentially flat versus the round-trip baseline here, so there's no reason to add itinerary complexity for it.",
+
+  "source_comparison": [
+    { "source": "Google Flights", "kind": "cash", "cabin": "Economy (per seat)", "headline": "$712", "carrier": "ZIPAIR nonstop", "detail": "US market; nonstop 10h55m", "cheapest": false },
+    { "source": "Ignav", "kind": "cash", "cabin": "Economy (per seat)", "headline": "$690", "carrier": "United nonstop", "detail": "US market, status: verified", "cheapest": true },
+    { "source": "Google Flights", "kind": "cash", "cabin": "Business (per seat)", "headline": "$4,220", "carrier": "ANA nonstop", "detail": "US market; lie-flat", "cheapest": false },
+    { "source": "Ignav", "kind": "cash", "cabin": "Business (per seat)", "headline": "$4,180", "carrier": "ANA nonstop", "detail": "US market, status: verified", "cheapest": true },
+    { "source": "Seats.aero", "kind": "award", "cabin": "Business (per seat, award)", "headline": "167,000 mi + $366", "carrier": "Qantas / Aeroplan (J)", "detail": "Award space open Nov 22 — points value beats the ~$4,180 cash fare", "cheapest": false }
+  ],
+  "cheapest_note": "Cheapest CASH per cabin is highlighted. The Seats.aero row is AWARD (points) data, not cash — shown as a cross-check, not a like-for-like price.",
+
+  "market_arbitrage": {
+    "ran": true,
+    "summary": "Tried the US (departure) and JP (destination) markets. Difference was marginal — under 1% on both cabins — so no market arbitrage win on this route this window. Did NOT try a 3rd market (would ask Devon first).",
+    "rows": [
+      { "market": "US", "cabin": "Business", "source": "Ignav", "price": "$4,180", "note": "USD" },
+      { "market": "JP", "cabin": "Business", "source": "Ignav", "price": "¥631,000 (~$4,205)", "note": "JPY; ~0.6% higher after FX" },
+      { "market": "US", "cabin": "Economy", "source": "Ignav", "price": "$690", "note": "USD" },
+      { "market": "JP", "cabin": "Economy", "source": "Ignav", "price": "¥104,500 (~$696)", "note": "JPY; effectively flat" }
+    ]
+  },
+
+  "date_matrix": {
+    "ran": true,
+    "summary": "Swept departures Nov 20–23 against returns Nov 30–Dec 3 (economy fare used as the mover). Cheapest pair was depart Sat Nov 21 / return Tue Dec 1 — ~$120/economy seat cheaper than the mid-week-out / weekend-back pair.",
+    "best_pair": "Depart Sat Nov 21 → Return Tue Dec 1 2026",
+    "rows": [
+      { "depart": "Nov 20 (Fri)", "return": "Dec 1 (Tue)", "price": "$742 econ", "note": "" },
+      { "depart": "Nov 21 (Sat)", "return": "Dec 1 (Tue)", "price": "$690 econ", "note": "cheapest" },
+      { "depart": "Nov 22 (Sun)", "return": "Nov 30 (Mon)", "price": "$758 econ", "note": "" },
+      { "depart": "Nov 23 (Mon)", "return": "Dec 3 (Thu)", "price": "$810 econ", "note": "" }
+    ]
+  },
+
+  "open_jaw": {
+    "relevant": true,
+    "summary": "Tokyo has two viable gateways (NRT and HND), so open-jaw was worth checking. Fly into NRT, out of HND came in within ~$25/seat of the plain round-trip into NRT — essentially flat. No reason to add complexity; recommending the straight round-trip.",
+    "roundtrip_baseline": "Round-trip SFO⇄NRT — economy $690 / business $4,180 per seat (baseline).",
+    "openjaw_option": "Open-jaw SFO→NRT, HND→SFO — economy ~$715 / business ~$4,205 per seat. ~$25 higher; not worth it here."
+  },
+
+  "hub_hacking": {
+    "relevant": true,
+    "recommended": false,
+    "summary": "Modeled a positioning play: cheap SFO→LAX leg, then a discounted ex-LAX business fare to NRT. It penciled out to roughly $430/business-seat saving versus booking straight from SFO.",
+    "threshold_note": "Below Devon's $1,000-business-class positioning-flight threshold ($430 < $1,000), so NOT recommended. Mentioned only for completeness.",
+    "risk_caveats": [
+      "Separate tickets = NO through-checked bags; reclaim and recheck at LAX.",
+      "NO airline rebooking protection across separate tickets — if the SFO→LAX leg is delayed and the LAX→NRT departure is missed, that long-haul seat may have to be re-bought outright.",
+      "Buffer-time rule: a same-day positioning leg needs 4–6+ hours of slack minimum; for a high-value business itinerary, arriving LAX the day before is the safer call — especially on a low-cost-carrier positioning leg."
+    ]
+  },
+
+  "hidden_city_note": "Not applicable / not recommended for this trip — it's a round-trip, and hidden-city/throwaway ticketing only ever works one-way or as a final segment, voids the remainder of the ticket the moment a segment is skipped, carries frequent-flyer account-ban risk, and can't through-check bags. Flagged here only so the omission is explicit.",
+
+  "sources_used": ["Google Flights (agent-browser)", "Ignav (cash cross-check)", "Seats.aero (award layer)"],
+  "footer_note": "Cash prices are point-in-time and expire fast; award space is volatile. Re-verify before booking."
+}
