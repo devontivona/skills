@@ -4,28 +4,86 @@
   "updated": "2026-07-18",
   "status": "complete",
   "title": "San Francisco → Tokyo — late November 2026",
-  "route_summary": "SFO ⇄ NRT · round-trip",
-  "example_notice": "This is a baked-in EXAMPLE report with fictional data (a made-up SFO→Tokyo search) shipped so the site always has something to show. Not a real Devon trip.",
+  "route_summary": "SFO ⇄ NRT/HND · round-trip · 2 business + 2 economy",
+  "example_notice": "Baked-in EXAMPLE report with fictional data (a made-up SFO→Tokyo search) shipped so the site always has something to show, and so future-Sunny has a complete worked reference for the ranked-field format. Not a real Devon trip; prices/award space invented for illustration.",
 
   "search_params": [
-    { "label": "Route(s)", "value": "SFO ⇄ Tokyo NRT — round-trip (open-jaw NRT-in / HND-out also checked)" },
+    { "label": "Route(s)", "value": "SFO ⇄ Tokyo — round-trip into NRT (open-jaw NRT-in / HND-out also checked)" },
     { "label": "Dates searched", "value": "Flexible window: depart Nov 20–23, return Nov 30–Dec 3 2026 (date-matrix swept)" },
     { "label": "Travelers", "value": "4 travelers — 2 adults + 2 adults" },
-    { "label": "Cabins", "value": "2 economy + 2 business (mixed; business confirmed as a hard requirement for the 2 premium travelers)" },
-    { "label": "Markets tried", "value": "US (departure), JP (destination)" }
+    { "label": "Cabins", "value": "2 economy + 2 business (mixed; business confirmed as a HARD requirement for the 2 premium travelers)" },
+    { "label": "Max stops per leg", "value": "Up to 2 stops per leg (Devon opted to allow up to 2 for this long-haul — that's what opens the award + one-stop field below; nonstop-only would have removed several cheaper rows)" },
+    { "label": "Markets tried", "value": "US (departure), JP (destination)" },
+    { "label": "Ranked field", "value": "Business cabin (the 2 premium seats) — that's the cabin with real variance worth ranking. Economy is a near-commodity here (~$690 nonstop, low spread) and is summarized in the source table, not ranked row-by-row." }
   ],
 
-  "recommendation": "Book the round-trip SFO⇄NRT: ANA nonstop for the 2 business travelers (~$4,180/seat via Ignav, matched within $40 on Google Flights) and United/ZIPAIR for the 2 economy travelers (~$690/seat).\n\nSkip the positioning-flight play — the modeled saving (~$430/business seat) is well under Devon's $1,000 business-class threshold, and it isn't worth the separate-ticket risk on a 4-person family trip.\n\nStrongly consider burning miles for the two business seats instead of cash: Seats.aero shows Qantas/Aeroplan award space at ~167k miles + ~$366 taxes per J seat on Nov 22 — that's dramatically better value than the ~$4,180 cash fare if the miles are available.",
-  "recommendation_reasoning": "Cash business is genuinely expensive this window and the cheapest cash source (Ignav) only undercut Google Flights by ~$40 — no meaningful cash arbitrage between the two markets tried.\n\nThe award layer is where the real money is: two J seats at 167k miles each is the classic premium-cabin points-crush-cash case, and it fits Devon's transferable-points profile. The catch is award space is volatile — it must be grabbed fast, so treat it as a 'decide now' option rather than something to sit on.\n\nOpen-jaw (NRT-in / HND-out) came in essentially flat versus the round-trip baseline here, so there's no reason to add itinerary complexity for it.",
+  "recommendation": "Top of the ranked field is the ANA \"The Room\" business award via Aeroplan — 88,000 miles + $240 taxes per seat, which converts to about $1,472 of value at a conservative 1.4¢/point. It's a nonstop lie-flat suite for roughly a third of the cheapest cash business fare. Grab it fast if the award space is live — award seats vanish.\n\nThat single row IS the recommendation: it's rank 1 because it's the cheapest adjusted price that clears every hard constraint. Everything below it in the table is a real, bookable alternative — so if points-hassle, loyalty, or seat quality matter more to you than the last few hundred dollars, pick a different row on purpose (see the \"consider instead\" callouts).",
+  "recommendation_reasoning": "The award layer crushes cash on this route this window, which is the whole reason Seats.aero is in the process — two nonstop lie-flat J seats at ~1.4¢/point of value is the textbook premium-cabin points-crush-cash case, and it fits a transferable-points household.\n\nThe catch is the usual one: award space is volatile and must be grabbed fast, so treat rank 1 as a \"decide now\" option rather than something to sit on. If it's gone by the time you look, rank 2 (United nonstop award, your own MileagePlus account) is the clean fallback.\n\nStraight cash business only starts around $3,780–$3,950 (JAL / United nonstop), so the cash floor is real money. Open-jaw (NRT-in / HND-out) came in ~$80 over the round-trip baseline — no gateway benefit here. The LAX positioning play pencils out ~$200 cheaper than straight cash, well under the $1,000 business-class threshold, so it stays in the table as a row but is NOT recommended.",
+
+  "ranking": {
+    "cash_rows": 10,
+    "award_rows": 6,
+    "rows_shown": 16,
+    "points_cents_per_point": 1.4,
+    "points_valuation_note": "Award rows are converted to a cash-equivalent \"adjusted price\" at a conservative 1.4¢ per point (a business-class rule-of-thumb redemption value, per The Points Guy's monthly valuations — thepointsguy.com/guide/monthly-valuations/). This is a rule of thumb, not a market price: it lets points and cash rows sit on one sortable table. The exact conversion used is shown on every award row below — never hidden as an internal-only calculation. Change the assumption and the ranking can shift.",
+    "hard_constraints": [
+      "Business cabin for the 2 premium travelers (hard requirement) — economy-only itineraries with no J availability were filtered out.",
+      "Max 2 stops per leg (Devon's stated tolerance for this trip) — a 3-stop low-cost self-transfer routing was filtered out.",
+      "Arrive Tokyo no later than the evening of the intended first full day — one routing that landed after that cutoff was filtered out."
+    ],
+    "filtered_out_count": 7,
+    "filtered_out_note": "7 itineraries were evaluated and filtered out BEFORE ranking for violating a hard constraint (wrong cabin / >2 stops / missed the arrival cutoff). They are not shown at all — the table below is real contenders only, not a greyed-out graveyard."
+  },
+
+  "consider_instead": [
+    {
+      "row_rank": 2,
+      "title": "United nonstop award — your own MileagePlus account",
+      "edge": "loyalty + simplicity",
+      "body": "Only ~$38 of adjusted value above rank 1, still nonstop and lie-flat, and it redeems straight from your own United MileagePlus account — no transfer partner, no chasing Aeroplan space, and it earns/credits against status you already hold. If the ~$38 gap is noise to you, this is arguably the better real-world pick: the loyalty value and the \"book it in one account\" simplicity are worth more than the rounding error."
+    },
+    {
+      "row_rank": 9,
+      "title": "United nonstop CASH ($3,950) — if you'd rather not burn miles",
+      "edge": "no award volatility + status",
+      "body": "If you don't want to spend points at all, the best straight-cash nonstop is United at $3,950 — again your own airline and status, no award-seat volatility to race against, and Polaris is a genuine lie-flat product. It's ~$2,500 more than the award, so this is a \"cash is simpler and I value that\" call, not a price call."
+    },
+    {
+      "row_rank": 13,
+      "title": "Qatar Qsuite ($4,600, 2 stops) — if the seat is the point",
+      "edge": "best-in-class business seat",
+      "body": "The concrete, nameable edge here is the cabin: Qatar's Qsuite is widely rated the best business-class seat flying (fully-enclosed door, quad \"double bed\" center pairs). If seat quality is what you're actually optimizing, this row wins on that axis alone — at the cost of being the priciest and a 2-stop, much longer travel day. Named explicitly so it isn't smoothed away just because it's not the cheapest."
+    }
+  ],
+
+  "ranked_itineraries": [
+    { "rank": 1, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "ANA", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "10h55m", "raw_price": "88,000 mi + $240", "points_conversion": "88,000 mi × 1.4¢ = $1,232 + $240 tax", "adjusted_price": "$1,472", "adjusted_price_num": 1472, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance — books via your Aeroplan/MileagePlus ecosystem", "seat_quality_note": "ANA \"The Room\" (777-300ER) — fully-enclosed business suite, lie-flat, ~21\" wide. Source: ANA published cabin spec + SeatGuru 777-300ER.", "is_recommendation": true },
+    { "rank": 2, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "United", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "11h05m", "raw_price": "95,000 mi + $180", "points_conversion": "95,000 mi × 1.4¢ = $1,330 + $180 tax", "adjusted_price": "$1,510", "adjusted_price_num": 1510, "loyalty_flag": true, "loyalty_tier": "direct", "loyalty_note": "United MileagePlus — account + status on file; redeem from your own account", "seat_quality_note": "United Polaris (777-300ER) — lie-flat, direct-aisle-access. Source: United published Polaris config." },
+    { "rank": 3, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "EVA Air", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→TPE→NRT, rt", "stops": "1 stop (TPE)", "duration": "14h20m", "raw_price": "120,000 mi + $150", "points_conversion": "120,000 mi × 1.4¢ = $1,680 + $150 tax", "adjusted_price": "$1,830", "adjusted_price_num": 1830, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": null },
+    { "rank": 4, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "Japan Airlines", "alliance": "oneworld", "routing_type": "standard", "route": "SFO→HND nonstop, rt", "stops": "Nonstop", "duration": "11h10m", "raw_price": "135,000 mi + $250", "points_conversion": "135,000 mi × 1.4¢ = $1,890 + $250 tax", "adjusted_price": "$2,140", "adjusted_price_num": 2140, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "oneworld — via your Alaska Mileage Plan / BA Avios accounts", "seat_quality_note": "JAL Sky Suite (777-300ER) — lie-flat, direct aisle access. Source: JAL published 777 config + SeatGuru." },
+    { "rank": 5, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "Korean Air", "alliance": "SkyTeam", "routing_type": "standard", "route": "SFO→ICN→NRT, rt", "stops": "1 stop (ICN)", "duration": "14h05m", "raw_price": "150,000 mi + $400", "points_conversion": "150,000 mi × 1.4¢ = $2,100 + $400 tax", "adjusted_price": "$2,500", "adjusted_price_num": 2500, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "SkyTeam — via your Delta SkyMiles / Flying Blue accounts", "seat_quality_note": "Korean Air Prestige Suites 2.0 (A330) — lie-flat. Source: SeatGuru A330-300 (KE)." },
+    { "rank": 6, "source": "Seats.aero", "kind": "award", "cabin": "Business", "airline": "Cathay Pacific", "alliance": "oneworld", "routing_type": "standard", "route": "SFO→HKG→NRT, rt", "stops": "1 stop (HKG)", "duration": "15h30m", "raw_price": "167,000 mi + $366", "points_conversion": "167,000 mi × 1.4¢ = $2,338 + $366 tax", "adjusted_price": "$2,704", "adjusted_price_num": 2704, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "oneworld — via Alaska Mileage Plan / BA Avios", "seat_quality_note": "Cathay Cirrus (A350) — reverse-herringbone, lie-flat, all-aisle-access. Source: SeatGuru A350-900 (CX)." },
+    { "rank": 7, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "ANA (ex-LAX)", "alliance": "Star Alliance", "routing_type": "hub-hack", "route": "SFO→LAX positioning + LAX→NRT nonstop, rt", "stops": "Nonstop long-haul (+ positioning leg)", "duration": "10h50m long-haul", "raw_price": "$3,750 cash (both tickets)", "points_conversion": null, "adjusted_price": "$3,750", "adjusted_price_num": 3750, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": "ANA \"The Room\" on the long-haul (see rank 1). Separate-ticket risk applies — see the hub-hacking section.", "caveat": "Separate positioning ticket. ~$200 under straight cash — below the $1,000 business-class threshold, so NOT recommended; shown for completeness." },
+    { "rank": 8, "source": "Ignav", "kind": "cash", "cabin": "Business", "airline": "Japan Airlines", "alliance": "oneworld", "routing_type": "standard", "route": "SFO→HND nonstop, rt", "stops": "Nonstop", "duration": "11h10m", "raw_price": "$3,780 cash", "points_conversion": null, "adjusted_price": "$3,780", "adjusted_price_num": 3780, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "oneworld — Alaska/BA", "seat_quality_note": "JAL Sky Suite — see rank 4." },
+    { "rank": 9, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "United", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "10h50m", "raw_price": "$3,950 cash", "points_conversion": null, "adjusted_price": "$3,950", "adjusted_price_num": 3950, "loyalty_flag": true, "loyalty_tier": "direct", "loyalty_note": "United MileagePlus — account + status on file", "seat_quality_note": "United Polaris — see rank 2." },
+    { "rank": 10, "source": "Ignav", "kind": "cash", "cabin": "Business", "airline": "ANA", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "10h55m", "raw_price": "$4,180 cash", "points_conversion": null, "adjusted_price": "$4,180", "adjusted_price_num": 4180, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": "ANA \"The Room\" — see rank 1. (Ignav quote; spot-checked within $40 of Google Flights.)" },
+    { "rank": 11, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "ANA", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "10h55m", "raw_price": "$4,220 cash", "points_conversion": null, "adjusted_price": "$4,220", "adjusted_price_num": 4220, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": null },
+    { "rank": 12, "source": "Ignav", "kind": "cash", "cabin": "Business", "airline": "ANA", "alliance": "Star Alliance", "routing_type": "open-jaw", "route": "SFO→NRT / HND→SFO (open-jaw), rt", "stops": "Nonstop each way", "duration": "10h55m / 11h05m", "raw_price": "$4,260 cash", "points_conversion": null, "adjusted_price": "$4,260", "adjusted_price_num": 4260, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": null, "caveat": "Open-jaw NRT-in / HND-out. ~$80 over the round-trip baseline — no gateway benefit on this trip." },
+    { "rank": 13, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "Qatar Airways", "alliance": "oneworld", "routing_type": "standard", "route": "SFO→DOH→NRT, rt", "stops": "2 stops (DOH)", "duration": "22h05m", "raw_price": "$4,600 cash", "points_conversion": null, "adjusted_price": "$4,600", "adjusted_price_num": 4600, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "oneworld — Alaska/BA", "seat_quality_note": "Qatar Qsuite (A350) — fully-enclosed business suite with door; center pairs convert to a double bed. Widely rated best business seat flying. Source: Qatar published Qsuite spec + SeatGuru A350-1000." },
+    { "rank": 14, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "Singapore Airlines", "alliance": "Star Alliance", "routing_type": "standard", "route": "SFO→SIN→NRT, rt", "stops": "2 stops (SIN)", "duration": "24h40m", "raw_price": "$4,850 cash", "points_conversion": null, "adjusted_price": "$4,850", "adjusted_price_num": 4850, "loyalty_flag": true, "loyalty_tier": "alliance", "loyalty_note": "Star Alliance", "seat_quality_note": "Singapore Airlines business (777-300ER) — lie-flat, forward-facing. Source: SeatGuru SQ 777-300ER." },
+    { "rank": 15, "source": "Ignav", "kind": "cash", "cabin": "Business", "airline": "Delta", "alliance": "SkyTeam", "routing_type": "standard", "route": "SFO→NRT nonstop, rt", "stops": "Nonstop", "duration": "11h15m", "raw_price": "$5,100 cash", "points_conversion": null, "adjusted_price": "$5,100", "adjusted_price_num": 5100, "loyalty_flag": true, "loyalty_tier": "direct", "loyalty_note": "Delta SkyMiles — account + status on file", "seat_quality_note": "Delta One Suite (A350) — lie-flat with privacy door. Source: Delta published A350 config." },
+    { "rank": 16, "source": "Google Flights", "kind": "cash", "cabin": "Business", "airline": "Air France", "alliance": "SkyTeam", "routing_type": "standard", "route": "SFO→CDG→NRT, rt", "stops": "2 stops (CDG)", "duration": "26h30m", "raw_price": "$5,400 cash", "points_conversion": null, "adjusted_price": "$5,400", "adjusted_price_num": 5400, "loyalty_flag": true, "loyalty_tier": "direct", "loyalty_note": "Air France–KLM Flying Blue — account on file", "seat_quality_note": "Air France business (777) — lie-flat. Source: SeatGuru AF 777-300ER. (Backtracking via CDG — long; shown as the tail of the field.)" }
+  ],
+  "ranked_note": "Ranked ascending by adjusted price — cheapest first. Award rows show the exact points→cash conversion used (1.4¢/point; see the ranking note). \"Loyalty\" flags a carrier in a program on file: a filled badge = a direct account/status (United, Delta, Alaska, BA, Air France/Flying Blue, Hawaiian); an outline badge = alliance-only reach via one of those. Loyalty and seat quality are real value the price column can't show — that's why the whole field is here, not just row 1.",
 
   "source_comparison": [
+    { "source": "Ignav", "kind": "cash", "cabin": "Economy (per seat)", "headline": "$690", "carrier": "United nonstop", "detail": "US market, status: verified — near-commodity; economy not ranked row-by-row", "cheapest": true },
     { "source": "Google Flights", "kind": "cash", "cabin": "Economy (per seat)", "headline": "$712", "carrier": "ZIPAIR nonstop", "detail": "US market; nonstop 10h55m", "cheapest": false },
-    { "source": "Ignav", "kind": "cash", "cabin": "Economy (per seat)", "headline": "$690", "carrier": "United nonstop", "detail": "US market, status: verified", "cheapest": true },
-    { "source": "Google Flights", "kind": "cash", "cabin": "Business (per seat)", "headline": "$4,220", "carrier": "ANA nonstop", "detail": "US market; lie-flat", "cheapest": false },
-    { "source": "Ignav", "kind": "cash", "cabin": "Business (per seat)", "headline": "$4,180", "carrier": "ANA nonstop", "detail": "US market, status: verified", "cheapest": true },
-    { "source": "Seats.aero", "kind": "award", "cabin": "Business (per seat, award)", "headline": "167,000 mi + $366", "carrier": "Qantas / Aeroplan (J)", "detail": "Award space open Nov 22 — points value beats the ~$4,180 cash fare", "cheapest": false }
+    { "source": "Google Flights", "kind": "cash", "cabin": "Business (per seat)", "headline": "$3,950", "carrier": "United nonstop", "detail": "cheapest straight-cash business; = ranked row 9", "cheapest": true },
+    { "source": "Ignav", "kind": "cash", "cabin": "Business (per seat)", "headline": "$3,780", "carrier": "JAL nonstop", "detail": "cheapest cash overall incl 1-stop; = ranked row 8", "cheapest": false },
+    { "source": "Seats.aero", "kind": "award", "cabin": "Business (per seat, award)", "headline": "88,000 mi + $240", "carrier": "ANA via Aeroplan (J)", "detail": "= ranked row 1 (the recommendation). ~$1,472 adjusted at 1.4¢/pt.", "cheapest": false }
   ],
-  "cheapest_note": "Cheapest CASH per cabin is highlighted. The Seats.aero row is AWARD (points) data, not cash — shown as a cross-check, not a like-for-like price.",
+  "cheapest_note": "This side-by-side is the SOURCE view (cheapest cash per cabin highlighted; the Seats.aero row is award, not like-for-like). The ranked field above is the primary artifact — it merges all three sources into one adjusted-price ranking. Economy is a near-commodity on this route (~$690 nonstop, low spread), so it's shown here rather than ranked row-by-row.",
 
   "market_arbitrage": {
     "ran": true,
@@ -40,7 +98,7 @@
 
   "date_matrix": {
     "ran": true,
-    "summary": "Swept departures Nov 20–23 against returns Nov 30–Dec 3 (economy fare used as the mover). Cheapest pair was depart Sat Nov 21 / return Tue Dec 1 — ~$120/economy seat cheaper than the mid-week-out / weekend-back pair.",
+    "summary": "Swept departures Nov 20–23 against returns Nov 30–Dec 3 (economy fare used as the mover). Cheapest pair was depart Sat Nov 21 / return Tue Dec 1 — ~$120/economy seat cheaper than the mid-week-out / weekend-back pair. The ranked field above is priced on this best pair.",
     "best_pair": "Depart Sat Nov 21 → Return Tue Dec 1 2026",
     "rows": [
       { "depart": "Nov 20 (Fri)", "return": "Dec 1 (Tue)", "price": "$742 econ", "note": "" },
@@ -52,16 +110,16 @@
 
   "open_jaw": {
     "relevant": true,
-    "summary": "Tokyo has two viable gateways (NRT and HND), so open-jaw was worth checking. Fly into NRT, out of HND came in within ~$25/seat of the plain round-trip into NRT — essentially flat. No reason to add complexity; recommending the straight round-trip.",
-    "roundtrip_baseline": "Round-trip SFO⇄NRT — economy $690 / business $4,180 per seat (baseline).",
-    "openjaw_option": "Open-jaw SFO→NRT, HND→SFO — economy ~$715 / business ~$4,205 per seat. ~$25 higher; not worth it here."
+    "summary": "Tokyo has two viable gateways (NRT and HND), so open-jaw was worth checking. Fly into NRT, out of HND came in within ~$80/seat of the plain round-trip into NRT — essentially flat (it's ranked row 12). No reason to add complexity; the straight round-trip wins.",
+    "roundtrip_baseline": "Round-trip SFO⇄NRT — business $4,180 per seat cash (ranked row 10 baseline).",
+    "openjaw_option": "Open-jaw SFO→NRT, HND→SFO — business ~$4,260 per seat (ranked row 12). ~$80 higher; not worth it here."
   },
 
   "hub_hacking": {
     "relevant": true,
     "recommended": false,
-    "summary": "Modeled a positioning play: cheap SFO→LAX leg, then a discounted ex-LAX business fare to NRT. It penciled out to roughly $430/business-seat saving versus booking straight from SFO.",
-    "threshold_note": "Below Devon's $1,000-business-class positioning-flight threshold ($430 < $1,000), so NOT recommended. Mentioned only for completeness.",
+    "summary": "Modeled a positioning play: cheap SFO→LAX leg, then a discounted ex-LAX ANA business fare to NRT (ranked row 7). It penciled out to roughly $200/business-seat cheaper than booking straight from SFO.",
+    "threshold_note": "Below Devon's $1,000-business-class positioning-flight threshold ($200 < $1,000), so NOT recommended. It stays in the ranked field (row 7) so you can see it, tagged with the separate-ticket caveat — but the saving doesn't justify the risk.",
     "risk_caveats": [
       "Separate tickets = NO through-checked bags; reclaim and recheck at LAX.",
       "NO airline rebooking protection across separate tickets — if the SFO→LAX leg is delayed and the LAX→NRT departure is missed, that long-haul seat may have to be re-bought outright.",
@@ -72,5 +130,5 @@
   "hidden_city_note": "Not applicable / not recommended for this trip — it's a round-trip, and hidden-city/throwaway ticketing only ever works one-way or as a final segment, voids the remainder of the ticket the moment a segment is skipped, carries frequent-flyer account-ban risk, and can't through-check bags. Flagged here only so the omission is explicit.",
 
   "sources_used": ["Google Flights (agent-browser)", "Ignav (cash cross-check)", "Seats.aero (award layer)"],
-  "footer_note": "Cash prices are point-in-time and expire fast; award space is volatile. Re-verify before booking."
+  "footer_note": "Cash prices are point-in-time and expire fast; award space is volatile. Adjusted prices for award rows use a 1.4¢/point rule of thumb (shown per row) — not a market price. Re-verify everything before booking."
 }

@@ -65,6 +65,21 @@ noted for context.)
 Source: The Points Guy, "How to Find and Book Airport Positioning Flights"
 (thepointsguy.com/guide/positioning-flights/).
 
+## 2b. Stop tolerance as a hard constraint (max stops per leg)
+
+Max acceptable stops per leg is a REQUIRED intake question (see SKILL.md intake) and becomes a
+**hard constraint** in the ranked field: any itinerary whose stops exceed the stated max is
+filtered out BEFORE ranking and never appears in the table.
+
+Why it's asked every time, never defaulted: stop tolerance is trip-specific (a business day-trip,
+a leisure trip, and travel with a toddler answer differently), and on long-haul international
+routes it is one of the biggest price levers there is. Demanding nonstop on a route like
+PDX/SFO→New Zealand or the US→much of Asia can eliminate the cheapest fares outright; allowing
+1–2 stops routinely saves hundreds to well over $1,000 in business, and frequently unlocks the
+best AWARD space too (partner award seats often exist on the 1-stop routing when the nonstop is
+blocked). Conversely, on a short domestic hop nonstop-only costs little. So: always ask, apply
+the answer as the filter, and if Devon is unsure, name the savings tradeoff and let him choose.
+
 ## 3. Fare calendar / flexible-date matrix search
 
 **What:** search a grid of departure-date × return-date pairs instead of one fixed pair. The
