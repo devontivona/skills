@@ -66,10 +66,21 @@ Batch ~3 questions per iMessage turn. Ask for whatever's missing:
 ## Step 1 — collect and store the data
 
 This is the part that changed most. Searches are NOT a flat cross-product of every technique ×
-every date × every market — that explodes combinatorially and most of it is redundant. Run it as
-a **funnel**: cheap, broad steps narrow down to a winning date(when relevant), and the more
-expensive/narrow techniques only run against that narrowed target. This keeps total query count
-roughly bounded (~20-35 for a full comprehensive search) and makes the process repeatable.
+every date × every market — that explodes combinatorially and most of it is redundant. But a
+strict single-winner funnel (find ONE cheapest date, then run everything else against only that
+date) is also wrong: it silently assumes the cheapest date pair for baseline round-trip pricing
+is ALSO the cheapest date pair for a currency-arbitrage market, or for a completely different
+open-jaw itinerary, or for a positioning leg's own pricing. That's not guaranteed —
+market-arbitrage is mostly a point-of-sale markup so it usually transfers, but open-jaw and
+hub-hack involve genuinely different flights with their own day-of-week pricing patterns, so the
+"winning" date from a baseline sweep isn't a safe assumption for them.
+
+The resolution: **funnel to a shortlist, not a single winner.** Run the cheap/broad steps first,
+keep the **top 2-3 candidates** (not just #1), and run the narrower/costlier techniques against
+that shortlist. This bounds the combinatorics to roughly a 2-3x multiplier on the later steps
+instead of either extreme (1x misses real winners; a full 6-8x cross-product on every technique
+is combinatorial excess). Total query count for a full comprehensive search should land around
+~25-40, not hundreds.
 
 **0. Create the search in flightdb first.**
 ```bash
@@ -88,26 +99,34 @@ price NUMBER with no actual bookable itinerary behind it, which is useless for a
 (no airline, no stops, no times — nothing to rank or book). Instead, run a bounded set of
 **real** date-pair searches (~6-8 pairs spread across the window, not every combination) against
 Google Flights (and Ignav if the window is small enough to be worth it), each logged as its own
-`query` with its own `result` rows. The strategy's job is to find the 1-2 *actually cheapest real
-date pairs* — narrow the funnel to those before continuing.
+`query` with its own `result` rows. The strategy's job is to produce a **shortlist of the 2-3
+cheapest real date pairs** — narrow the funnel to those, not to a single winner, before
+continuing.
 
-**3. Everything after this runs against the winning date pair(s) from step 2 (or the fixed dates
-from step 1 if there was no sweep) — NOT against every date pair tried.** This is the answer to
-"how do open-jaw / market-arbitrage combine with date sweeping": they don't cross-multiply with
-it, they run ONCE against whichever date(s) the funnel has already narrowed to.
-   - **Market-arbitrage strategy (international routes).** Re-run the winning date pair via
+**3. Everything after this runs against the shortlisted date pair(s) from step 2 (or the fixed
+dates from step 1 if there was no sweep) — NOT against every date pair originally tried.** This
+is the answer to "how do open-jaw / market-arbitrage combine with date sweeping": they don't
+cross-multiply with the full sweep, but they DO check each shortlisted candidate (2-3, not 6-8) —
+enough to catch a case where the "obvious" cheapest baseline date isn't actually the best date
+once a different market or a different itinerary structure is factored in.
+   - **Market-arbitrage strategy (international routes).** Re-run each shortlisted date pair via
      Google Flights `&gl=XX` and Ignav's `market` param for 2 country markets (departure +
-     destination). Ask before a 3rd.
+     destination). Ask before a 3rd. Cheap to extend across the shortlist since it's the same
+     query mechanism with one parameter changed.
    - **Open-jaw strategy (if warranted).** Compare open-jaw (into A, out of B) against the
-     round-trip-into-one-gateway baseline, for the winning date(s) only.
+     round-trip-into-one-gateway baseline, for each shortlisted date pair — don't assume the
+     baseline's cheapest date is automatically open-jaw's cheapest date too, since it's a
+     different set of flights entirely.
    - **Hub-hack strategy (when a positioning leg could plausibly beat a through-fare).**
-     Calculate a positioning-leg + separate-long-haul-ticket combo for the winning date(s).
-     Recommend it only when it clears the **$1,000-business-class threshold** (see
+     Calculate a positioning-leg + separate-long-haul-ticket combo for each shortlisted date
+     pair (the positioning leg has its own day-of-week pricing, independent of the long-haul
+     leg's). Recommend it only when it clears the **$1,000-business-class threshold** (see
      `references/methodology.md` for the full risk caveats — no through-checked bags, no
      rebooking protection, buffer-time table). Below threshold, it can still be logged as a
      result, just never recommended.
    - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play — log
-     award availability for the winning date(s) as its own strategy/queries.
+     award availability for the shortlisted date pair(s) as its own strategy/queries.
+
 
 Log every query and every result via flightdb as you go:
 ```bash
@@ -197,7 +216,8 @@ field beyond the top handful, that's available on request via `flightdb export`/
 - Don't use Google Flights' calendar/price-graph view for the date sweep — it has no real
   itinerary behind its numbers. Run real date-pair searches instead.
 - Don't cross-multiply every strategy against every date pair or market — funnel down to a
-  winning date first (Step 1), then run the narrower techniques once against it.
+  shortlist of 2-3 candidate dates first (Step 1), then run the narrower techniques against that
+  shortlist, not a single assumed winner and not the full original sweep.
 - Don't rank by eye — use `flightdb export`/`rank`; if the order looks wrong, fix the data/params
   feeding it, not the algorithm's output.
 - Don't hide the points→cash valuation — always show the per-point rate and the conversion math.
