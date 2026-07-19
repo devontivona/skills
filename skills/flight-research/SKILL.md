@@ -68,14 +68,28 @@ Batch ~3 questions per iMessage turn. Ask for whatever's missing:
 Searches are run as a **funnel to a shortlist** — not a flat cross-product of every technique ×
 every date × every market (that explodes combinatorially and most of it is redundant), and not a
 funnel to a single winning date either (that silently assumes the cheapest date for baseline
-round-trip pricing is also cheapest for a currency-arbitrage market, or for a completely
-different open-jaw itinerary, or for a positioning leg with its own day-of-week pricing — not a
-safe assumption, since open-jaw and hub-hack involve genuinely different flights).
+round-trip pricing is also cheapest for every other technique — not a safe assumption).
 
-The shape: run the cheap/broad steps first, keep the **top 2-3 candidates** (not just #1), and
-run the narrower/costlier techniques against that shortlist. This keeps total query count for a
-full comprehensive search around ~25-40, and still catches cases where a different date wins
-once the market or itinerary structure changes.
+**The shortlist size is NOT one-size-fits-all — it depends on how correlated a strategy's
+date-sensitivity actually is with the baseline's:**
+
+- **Market-arbitrage transfers well — keep its shortlist narrow (2-3 dates).** It reprices the
+  SAME flights the baseline already found, just at a different point of sale. The demand curve
+  that made a date cheap doesn't change by currency, so the baseline's cheap dates are a good bet
+  here too.
+- **Open-jaw and hub-hack transfer poorly — widen their shortlist to 5-6 dates.** Both involve
+  genuinely different flights than the baseline (a different return city for open-jaw; two
+  separate tickets with independent pricing for hub-hack), each with their own day-of-week
+  demand curve that has no reason to agree with the baseline's.
+- **Award availability (Seats.aero) transfers worst of all — widen it to 5-6 dates too, treat it
+  as close to independent of cash pricing.** Award space isn't demand-curve pricing, it's
+  inventory release, which is lumpy and largely uncorrelated with cash fares. A date that's
+  expensive in cash can have wide-open saver awards and vice versa — reusing a narrow cash-based
+  shortlist here risks missing real award space for no good reason.
+
+This keeps the strategies that genuinely need more coverage covered, without re-introducing the
+blowup by widening every strategy uniformly. Total query count for a full comprehensive search
+lands roughly in the ~35-55 range depending on which strategies actually apply to the trip.
 
 **0. Create the search in flightdb first.**
 ```bash
@@ -92,31 +106,31 @@ this one. Log each source hit as a `query`, log every itinerary it returns as a 
 searches.** Do NOT use Google Flights' calendar/price-graph view for this — it shows a per-day
 price NUMBER with no actual bookable itinerary behind it, which is useless for a `result` row
 (no airline, no stops, no times — nothing to rank or book). Instead, run a bounded set of
-**real** date-pair searches (~6-8 pairs spread across the window, not every combination) against
+**real** date-pair searches (~8-10 pairs spread across the window, not every combination) against
 Google Flights (and Ignav if the window is small enough to be worth it), each logged as its own
-`query` with its own `result` rows. The strategy's job is to produce a **shortlist of the 2-3
-cheapest real date pairs** — not a single winner.
+`query` with its own `result` rows. The strategy's job is to rank all the real date pairs tried
+by price — the shortlist each downstream strategy draws from (2-3 or 5-6, per the split above)
+comes out of this one ranked list.
 
-**3. Everything after this runs against the shortlisted date pair(s)** from step 2 (or the fixed
-dates from step 1 if there was no sweep) — not against every date pair originally tried, and not
-collapsed to a single assumed-best date:
-   - **Market-arbitrage strategy (international routes).** Re-run each shortlisted date pair via
-     Google Flights `&gl=XX` and Ignav's `market` param for 2 country markets (departure +
-     destination). Ask before a 3rd. Cheap to extend across the shortlist since it's the same
-     query mechanism with one parameter changed.
+**3. Everything after this runs against the appropriate shortlist from step 2** (or the fixed
+dates from step 1 if there was no sweep) — not against every date pair originally tried:
+   - **Market-arbitrage strategy (international routes).** Re-run the top 2-3 shortlisted date
+     pairs via Google Flights `&gl=XX` and Ignav's `market` param for 2 country markets
+     (departure + destination). Ask before a 3rd market.
    - **Open-jaw strategy (if warranted).** Compare open-jaw (into A, out of B) against the
-     round-trip-into-one-gateway baseline, for each shortlisted date pair — a different set of
-     flights than the baseline, so it needs its own check rather than inheriting baseline's
-     cheapest date.
+     round-trip-into-one-gateway baseline, for the top 5-6 shortlisted date pairs — wider than
+     market-arbitrage's shortlist, since it's a different set of flights with its own pricing
+     pattern.
    - **Hub-hack strategy (when a positioning leg could plausibly beat a through-fare).**
-     Calculate a positioning-leg + separate-long-haul-ticket combo for each shortlisted date
-     pair (the positioning leg has its own day-of-week pricing, independent of the long-haul
-     leg's). Recommend it only when it clears the **$1,000-business-class threshold** (see
-     `references/methodology.md` for the full risk caveats — no through-checked bags, no
+     Calculate a positioning-leg + separate-long-haul-ticket combo for the top 5-6 shortlisted
+     date pairs (the positioning leg has its own day-of-week pricing, independent of the
+     long-haul leg's). Recommend it only when it clears the **$1,000-business-class threshold**
+     (see `references/methodology.md` for the full risk caveats — no through-checked bags, no
      rebooking protection, buffer-time table). Below threshold, it can still be logged as a
      result, just never recommended.
-   - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play — log
-     award availability for the shortlisted date pair(s) as its own strategy/queries.
+   - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play, across
+     the top 5-6 shortlisted date pairs — award inventory release is lumpy and largely
+     independent of cash pricing, so it gets the wider shortlist too, not the narrow one.
 
 Log every query and every result via flightdb as you go:
 ```bash
@@ -198,9 +212,11 @@ field beyond the top handful, that's available on request via `flightdb export`/
 - Don't assume cabin class or stop tolerance — ask per traveler / every search.
 - Don't use Google Flights' calendar/price-graph view for the date sweep — it has no real
   itinerary behind its numbers. Run real date-pair searches instead.
-- Don't cross-multiply every strategy against every date pair or market — funnel down to a
-  shortlist of 2-3 candidate dates first (Step 1), then run the narrower techniques against that
-  shortlist, not a single assumed winner and not the full original sweep.
+- Don't cross-multiply every strategy against every date pair or market — funnel to a shortlist
+  (Step 1). Keep market-arbitrage's shortlist narrow (2-3 dates, since it reprices the same
+  flights the baseline already found); widen open-jaw's, hub-hack's, and the award
+  cross-check's shortlists to 5-6 dates each, since those don't inherit the baseline's pricing
+  pattern.
 - Don't rank by eye — use `flightdb export`/`rank`; if the order looks wrong, fix the data/params
   feeding it, not the algorithm's output.
 - Don't hide the points→cash valuation — always show the per-point rate and the conversion math.
