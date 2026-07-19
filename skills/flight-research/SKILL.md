@@ -1,222 +1,210 @@
 ---
 name: flight-research
-description: "Comprehensive multi-source flight search for Devon. Use for ANY flight search request (unless he asks for a quick single lookup): runs Google Flights + Ignav cash cross-check + Seats.aero award layer, market arbitrage, date-matrix sweep, open-jaw and hub-hacking comparison, and always publishes ONE standardized report to flights.waywardlane.com. Keywords: flights, airfare, book a flight, cheapest flight, business class, open-jaw, positioning flight, hub hacking, award availability, miles, fare calendar."
+description: "Comprehensive multi-source flight search for Devon. Use for ANY flight search request (unless he asks for a quick single lookup): runs a funnel of search strategies across Google Flights, Ignav, and Seats.aero, stores every result in the flightdb SQLite database, ranks deterministically, and messages Devon a recommendation + alternatives + a search-scale summary. Keywords: flights, airfare, book a flight, cheapest flight, business class, open-jaw, positioning flight, hub hacking, award availability, miles, fare calendar, flightdb."
 ---
 
 # Flight-research — the comprehensive search process
 
 This is what Sunny reaches for whenever Devon asks about finding, comparing, or booking a
 flight. **Default to the full comprehensive process below — never a quick single-source
-lookup — UNLESS Devon explicitly asks for a "quick" check or "just look at one thing."** He
-asked for a standardized, thorough search every time; that's the whole point of this skill.
-
-Every completed search produces **ONE published report** on the dedicated site
-(`flights.waywardlane.com`) — this is mandatory, not optional. Tell Devon the direct report URL
-when you finish.
+lookup — UNLESS Devon explicitly asks for a "quick" check or "just look at one thing."**
 
 Tell Devon up front a full search takes a bit (multiple sources, possibly a date sweep), so he
 knows it's not an instant reply.
 
-## Sources (what's actually built, stated accurately)
+## Glossary — use these terms consistently, everywhere
 
-Three working sources are wired for this skill. Be accurate about what exists — do NOT repeat
-the installed `flight-search-strategy` skill's inflated "Duffel/Skiplagged/Kiwi all zero-config"
-framing (per the research, Duffel needs a business/KYC gate, Skiplagged has no sanctioned public
-API, Kiwi's current terms are unverified — none of those three are built here).
+- **Search** — the whole flight-research project for one trip, e.g. "PDX→Auckland Nov 2026." One
+  row in flightdb's `searches` table.
+- **Strategy** — a named search *technique*: `baseline`, `flex-date-sweep`, `market-arbitrage`,
+  `open-jaw`, `hub-hack`. Describes the "how" of one angle of attack.
+- **Query** — *one actual search execution* against *one source*: a specific origin/destination,
+  date(s), cabin, passenger count, run at some point in time. A strategy is carried out via one
+  or more queries.
+- **Result** — *one bookable itinerary* a query returned (outbound+return or one-way, with
+  price/airline/stops/duration). One query can return many results.
+- **Source** — the data provider a query hit: Google Flights, Ignav, or Seats.aero. Not a
+  ranking axis of its own — see the ranking algorithm below.
 
-1. **Google Flights** — the installed `google-flights` skill (agent-browser). Fast cash
-   baseline, the ONLY source for Southwest cash prices, and the `&gl=XX` market lever. Its
-   econ/biz parallel-session split matches Devon's mixed-cabin need. Accurate and trusted; use
-   as-is. (Its URL fast-path fails for multi-city and premium economy — use its interactive
-   fallback for those.)
-2. **Ignav** — `skill:ignav`. Second cash-fare source with explicit `cabin_class`,
-   multi-passenger, and `market` currency/locale arbitrage. Treat as a genuine cross-check
-   against Google Flights, not a fallback. It's a young product — spot-check a quoted price
-   against Google Flights; flag a lone outlier, don't trust it blindly.
-3. **Seats.aero** — `skill:seats-aero`. POINTS/AWARD availability only (never cash). The
+`search → strategy → query → result`, nested. This is flightdb's actual schema
+(`~/.sunny/data/projects/flightdb/`) — read its README for the full column reference.
+
+## Sources
+
+Three sources are wired:
+
+1. **Google Flights** (`google-flights` skill, agent-browser). Cash baseline, only source for
+   Southwest, has the `&gl=XX` market lever. Its URL fast-path fails for multi-city/premium
+   economy — use its interactive fallback for those.
+2. **Ignav** (`skill:ignav`). Second cash source: explicit `cabin_class`, multi-passenger,
+   `market` currency/locale arbitrage. A young API — spot-check a quoted price against Google
+   Flights and flag a lone outlier.
+3. **Seats.aero** (`skill:seats-aero`). Points/award availability only, never cash. The
    business/first cross-check layer.
+
+Duffel, Skiplagged, and Kiwi are NOT wired here (business/KYC gate, no sanctioned public API,
+unverified terms respectively) — don't imply otherwise.
 
 ## Intake — ask only what isn't already given
 
-Batch questions ~3 per iMessage turn (SUNNY iMessage norm). Ask for whatever's missing:
+Batch ~3 questions per iMessage turn. Ask for whatever's missing:
 
-- **Origin(s) / destination(s) or region** — home airport(s) and where he's going.
-- **Dates: exact vs a window.** If dates are flexible, that TRIGGERS the fare-calendar /
-  date-matrix sweep (see step 5) — confirm the window.
-- **Cabin class PER traveler** — economy / business / mixed. **Always ask explicitly; never
-  assume.** Devon's household prior is often 2 economy + 2 business for international trips, but
-  that's a prior to confirm, not a rule to apply silently. When he says business is a *hard
-  requirement* for certain travelers, treat it as one — do NOT quietly substitute premium
-  economy as a cost-saving suggestion unless he asked to compare that.
+- **Origin(s) / destination(s) or region.**
+- **Dates: exact vs a window.** A flexible window triggers the flex-date-sweep strategy below.
+- **Cabin class PER traveler.** Always ask explicitly; never assume. When business is a stated
+  hard requirement for a traveler, treat it as one — don't quietly suggest premium economy as a
+  "saving" unless asked to compare that.
 - **Number of travelers.**
-- **Max acceptable stops per leg (0 = nonstop only / 1 / 2+).** **Required — ALWAYS ask, every
-  search; never assume a default.** Stop tolerance is trip-specific: a business trip, a leisure
-  trip, and travel with a toddler will each answer differently, so there is no safe household
-  prior to apply silently. This matters MOST on long-haul international routes: on a trip like
-  PDX→New Zealand, demanding nonstop can eliminate the cheapest fares entirely, while allowing
-  1–2 stops routinely saves a large amount (hundreds to well over a thousand dollars in
-  business), and often unlocks the best award space too. This answer becomes a HARD CONSTRAINT
-  in the ranking (see Output): itineraries exceeding the stated max are filtered out before
-  ranking and never appear in the table. If Devon is unsure, briefly note the savings tradeoff
-  and let him pick — don't decide for him.
-- **Open-jaw worth exploring?** Ask when the destination has 2+ viable gateway airports/regions
-  (multi-island or multi-city countries, land tours) — see step 6.
+- **Max acceptable stops per leg (0 = nonstop only / 1 / 2+).** Always ask, every search — never
+  default. This is a HARD CONSTRAINT at ranking time: itineraries exceeding it are filtered out
+  before ranking. On long-haul international routes this is one of the biggest price levers
+  there is — nonstop-only can eliminate the cheapest fares outright, while allowing 1-2 stops
+  often saves hundreds to over $1,000 in business and unlocks better award space. If Devon's
+  unsure, name the tradeoff briefly and let him pick.
+- **Open-jaw worth exploring?** Ask when the destination has 2+ viable gateway airports/regions.
 
-## The search process
+## Step 1 — collect and store the data
 
-Run the applicable steps. More calls is expected here — comprehensiveness is the deliverable.
+This is the part that changed most. Searches are NOT a flat cross-product of every technique ×
+every date × every market — that explodes combinatorially and most of it is redundant. Run it as
+a **funnel**: cheap, broad steps narrow down to a winning date(when relevant), and the more
+expensive/narrow techniques only run against that narrowed target. This keeps total query count
+roughly bounded (~20-35 for a full comprehensive search) and makes the process repeatable.
 
-1. **Google Flights baseline.** Fast cash baseline + Southwest coverage. When dates are
-   flexible, use its calendar / price-graph "many dates at once" view.
-2. **Ignav cash cross-check.** Cash fares with explicit `cabin_class` + `adults` + `market`.
-   Cross-check its prices against Google Flights; flag divergence.
-3. **Seats.aero award cross-check.** Run this **whenever a business- or first-class cash fare
-   comes back — always for a business-class search.** Present award space as a secondary
-   "there's a much better points option here" signal, never as a replacement for the cash
-   comparison.
-4. **Market arbitrage (international routes).** Try at least **2** country markets — the
-   departure-country and destination-country markets — via Google Flights `&gl=XX` and Ignav's
-   `market` param. **Ask Devon before trying a 3rd** market.
-5. **Date-matrix sweep (if dates are flexible).** Run multiple departure×return date pairs, not
-   one fixed pair — this is the comprehensive behavior Devon explicitly asked for. Don't skip it
-   just because it's more calls. Report the best date-pair found.
-6. **Open-jaw comparison (if warranted).** If the trip has genuine multi-destination structure,
-   OR the destination country/region has 2+ viable gateway airports, explicitly compare
-   **open-jaw (into A, out of B) against the round-trip-into-one-gateway baseline**, and present
-   BOTH. Prefer Google Flights' native multi-city search for true open-jaw (the google-flights
-   URL fast-path fails for multi-city — use its interactive fallback); Ignav has no multi-city
-   endpoint, so with Ignav open-jaw means summing two one-way calls as a numeric cross-check
-   only.
-7. **Hub-hacking / positioning-flight option.** When a domestic positioning leg + a separate
-   international ticket from a major hub could beat a direct/connected fare, calculate and
-   present it as an option — but **only RECOMMEND it when the savings exceed $1,000 for a
-   business-class ticket** (Devon's explicit threshold — the **$1,000-business-class
-   positioning-flight rule**). Below that threshold, the separate-ticket risk isn't worth it;
-   you may still mention it as a non-recommended option. ALWAYS attach the risk caveats: no
-   through-checked bags, no airline rebooking protection across separate tickets, and the
-   buffer-time rule (several hours same-day minimum, up to a full day+ — largest buffer for
-   low-cost-carrier positioning legs). See `references/methodology.md` for the buffer-time table.
-8. **Hidden-city / throwaway ticketing.** Mention as a known technique ONLY if directly
-   relevant, and ALWAYS attach the contract-of-carriage / account-risk caveat (see methodology).
-   Never present it as a default recommendation; never for a round-trip.
-9. **Business class is often a HARD requirement.** Re-read step-8 of intake: don't downgrade a
-   required-business traveler to premium economy as a "saving" unless asked.
+**0. Create the search in flightdb first.**
+```bash
+python3 ~/.sunny/data/projects/flightdb/flightdb.py search create \
+  --id <slug> --title "<route + month>" --params '{"cabin":"business","max_stops":1,"adults":2,...}'
+```
+Store every intake answer in `--params` — it's the audit trail for what was actually asked for.
 
-## Output — publish ONE standardized report (mandatory)
+**1. Baseline strategy — one fixed date pair (or the stated exact dates), all 3 sources.**
+This seeds the funnel and is the reference every other strategy is compared against. Always run
+this one. Log each source hit as a `query`, log every itinerary it returns as a `result`.
 
-Every completed search publishes exactly one report to the flights site. The report schema, the
-JSON-on-disk shape, and a full worked example are in `references/report-template.md` (and a
-copy of the example lives at `assets/example-report.json` — read it; it's a complete worked
-reference, not a stub). In short:
+**2. Flex-date-sweep strategy — ONLY if dates are flexible, and ONLY with real result-list
+searches.** Do NOT use Google Flights' calendar/price-graph view for this — it shows a per-day
+price NUMBER with no actual bookable itinerary behind it, which is useless for a `result` row
+(no airline, no stops, no times — nothing to rank or book). Instead, run a bounded set of
+**real** date-pair searches (~6-8 pairs spread across the window, not every combination) against
+Google Flights (and Ignav if the window is small enough to be worth it), each logged as its own
+`query` with its own `result` rows. The strategy's job is to find the 1-2 *actually cheapest real
+date pairs* — narrow the funnel to those before continuing.
 
-1. Write one JSON file per search to
-   `~/.sunny/data/sites/flights/data/reports/<slug>.json` (slug = short kebab-case of the
-   route+month, e.g. `sfo-tokyo-nov2026`).
-2. The site's server reads that directory fresh per request — no rebuild/restart needed after
-   writing a report file (only `devbox restart flights` if you edit `server.js` itself).
-3. Confirm it's live: `curl -sI https://flights.waywardlane.com/report/<slug>` and check the
-   index lists it, then send Devon the **direct report URL** (not just the index) in your reply.
+**3. Everything after this runs against the winning date pair(s) from step 2 (or the fixed dates
+from step 1 if there was no sweep) — NOT against every date pair tried.** This is the answer to
+"how do open-jaw / market-arbitrage combine with date sweeping": they don't cross-multiply with
+it, they run ONCE against whichever date(s) the funnel has already narrowed to.
+   - **Market-arbitrage strategy (international routes).** Re-run the winning date pair via
+     Google Flights `&gl=XX` and Ignav's `market` param for 2 country markets (departure +
+     destination). Ask before a 3rd.
+   - **Open-jaw strategy (if warranted).** Compare open-jaw (into A, out of B) against the
+     round-trip-into-one-gateway baseline, for the winning date(s) only.
+   - **Hub-hack strategy (when a positioning leg could plausibly beat a through-fare).**
+     Calculate a positioning-leg + separate-long-haul-ticket combo for the winning date(s).
+     Recommend it only when it clears the **$1,000-business-class threshold** (see
+     `references/methodology.md` for the full risk caveats — no through-checked bags, no
+     rebooking protection, buffer-time table). Below threshold, it can still be logged as a
+     result, just never recommended.
+   - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play — log
+     award availability for the winning date(s) as its own strategy/queries.
 
-### The report shape — the ranked field is the primary artifact
+Log every query and every result via flightdb as you go:
+```bash
+python3 flightdb.py strategy add --search <slug> --name flex-date-sweep --description "..."
+python3 flightdb.py query add --strategy <id> --source google_flights --origin PDX \
+  --destination AKL --depart 2026-11-21 --return 2026-12-06 --cabin business --adults 2 --max-stops 1
+python3 flightdb.py result add --query <id> --json '[{...}, {...}]'
+```
 
-The report leads with the recommendation and then a **full ranked table of every real
-contender** — that table is the centerpiece, not a top-line verdict with the evidence buried
-below. **The recommendation is explicitly "the top row of the table," not a separately-derived
-claim.** The point (Devon's own): if he doesn't want your #1, the report is still useful because
-he can see the whole ranked field and pick a different row for an intangible reason you can't
-price (airline loyalty, a better business seat, a shorter layover). Present the recommendation
-as row 1 of visible data he can second-guess — never a conclusion handed down apart from the
-evidence.
+Cut techniques (do not run these — they were removed on review):
+- **Hidden-city / throwaway ticketing** — dropped. Rarely used, high account risk, low value for
+  how often it actually applies. If Devon explicitly asks about it in the future, treat it as a
+  one-off question, not a standing strategy in this funnel.
 
-Order on the page: recommendation (= the highlighted top row, restated) → **ranked field**
-(the table) → search parameters → source-comparison table (now supporting context) →
-market-arbitrage / date-matrix / open-jaw / hub-hacking narrative sections (elaboration around
-the data) → hidden-city note. The narrative sections are kept — they become supporting context
-around the table, not replaced by it.
+## Step 2 — rank the options (deterministic, code does it — not judgment)
 
-### The ranking algorithm (execute exactly — don't re-derive it)
+flightdb's `rank`/`export` commands already implement this as a **simple, deterministic Python
+algorithm** — filter, dedupe, sort — driven entirely by the search's stored params. Use it as-is;
+don't re-derive ranking logic by eye.
 
-Rank the cabin that actually has variance worth ranking (usually the premium/business cabin;
-a near-commodity economy leg can stay summarized in the source table). Steps:
+```bash
+python3 ~/.sunny/data/projects/flightdb/flightdb.py export --search <slug> \
+  --cabin business --max-stops 1 --points-rate 1.4 --limit 20
+```
 
-1. **Hard-constraint filter FIRST, before ranking.** Drop any itinerary that violates a hard
-   constraint: wrong cabin for a required-cabin traveler; **stops exceeding the stated max per
-   leg** (the intake answer above); misses the arrival deadline; or any other stated
-   non-negotiable. **Filtered-out itineraries do NOT appear in the table at all — not even
-   greyed out.** Keep the table to real contenders only. Record how many were filtered and why
-   (the `ranking.filtered_out_*` fields) so the omission is visible without listing them.
-2. **Adjusted total price per surviving row.** For a cash fare, adjusted price = the total
-   price. For an award/points row, convert to a cash-equivalent using a **stated, VISIBLE
-   valuation-per-point**: default **~1.4¢/point for business-class redemptions**. This is a
-   rule of thumb (cite it as such — e.g. The Points Guy's monthly valuations,
-   thepointsguy.com/guide/monthly-valuations/), NOT a market price. The exact conversion used
-   MUST be shown on the report itself — per award row AND in the ranking note — never hidden as
-   an internal-only calculation. Changing the assumption can change the ranking, so it's shown.
-3. **Sort ascending by adjusted total price** — cheapest first. Cash and award rows sit on one
-   sortable table precisely because award rows were converted in step 2.
-4. **Tag every row (do NOT collapse into a hidden weighted score).** Ranking, not scoring —
-   burying judgment in one opaque number is exactly what Devon rejected. Each row carries these
-   fields (encoded in the JSON schema — see `references/report-template.md`):
-   - `source` — Google Flights / Ignav / Seats.aero.
-   - `airline` + `alliance` — carrier and its alliance.
-   - `routing_type` — `standard` (round-trip) / `open-jaw` / `hub-hack` (positioning).
-   - `stops` — stops per leg.
-   - `duration` — total travel time.
-   - `adjusted_price` (+ `adjusted_price_num` for sorting) and, for award rows,
-     `raw_price` + `points_conversion` (the shown "88,000 mi × 1.4¢ = …" string).
-   - `loyalty_flag` / `loyalty_tier` / `loyalty_note` — see step 5.
-   - `seat_quality_note` — **only ever populated from real sourced information** (e.g. a cited
-     SeatGuru / airline-published cabin spec). **Never invented or guessed.** If unknown, leave
-     it null/omitted — do NOT fabricate a plausible-sounding claim. A named source is required
-     whenever it's present.
-5. **Loyalty flag.** Cross-reference each row's airline/alliance against Devon's known loyalty
-   programs (the lookup list is baked into `references/report-template.md` so you don't
-   re-discover it every search — it's derived from the 1Password "Kate & Devon" vault). Set
-   `loyalty_tier: "direct"` when the carrier itself is a program Devon holds an account with
-   (renders as a filled badge); `loyalty_tier: "alliance"` when he only reaches it through an
-   alliance partner he holds (outline badge). Loyalty is real value the price column can't
-   capture — flag it, don't price it.
-6. **Show the top 15–20 rows** (configurable; default 20), cheapest-adjusted-first, with the #1
-   row highlighted (`is_recommendation: true`).
-7. **"Consider instead" callouts.** After the highlighted top row, if a DIFFERENT row in the
-   top ~3–5 has a concrete, nameable edge — existing loyalty status, meaningfully better
-   schedule/arrival time, meaningfully shorter connection, or sourced better seat quality —
-   call it out as its own short callout near the top of the table (`consider_instead[]`), the
-   way decision-coach surfaces disagreement instead of smoothing it over. Do NOT fold it into
-   the recommendation, and do NOT manufacture a callout when there isn't a concrete edge to
-   name — zero callouts is correct when the top row is strictly best.
+What it does, in order (see the flightdb README for the exact mechanics):
+1. **Hard-constraint filter first.** Drops any result violating a stated non-negotiable (wrong
+   cabin for a required-cabin traveler, stops over the max, misses an arrival deadline). Filtered
+   rows never appear downstream — not even greyed out. The filtered-out count is retained
+   (`ranking.filtered_out_count`) so the omission stays visible as a number, never silent.
+2. **Dedup.** Collapses repeat finds of the same itinerary surfaced by overlapping queries
+   (`dedup_key`), so a rank position is one distinct itinerary, not a repeat.
+3. **Adjusted price.** Cash rows use the total price as-is. Award rows convert points to a
+   cash-equivalent using a stated, visible rate — default 1.4¢/point for business-class
+   redemptions (a rule of thumb, cite it as such — e.g. The Points Guy's monthly valuations).
+   Always show the conversion string (`"88,000 mi × 1.4¢ = $1,232 + $240 tax = $1,472"`), never
+   hide it.
+4. **Sort ascending by adjusted price.** Cash and award rows land on one sortable ranking because
+   step 3 already put them in comparable dollars.
+5. **Same inputs → same output, every time.** This is the whole point of pushing ranking into
+   code instead of doing it by eye — a re-run against unchanged data reproduces the same order.
 
-The page still also shows: search parameters; the source-comparison table (Google Flights /
-Ignav / Seats.aero side by side, cheapest cash highlighted); a market-arbitrage summary if run;
-a date-matrix summary (best date-pair) if run; an open-jaw comparison when relevant; a
-hub-hacking section when relevant (risk caveats always visible); and the recommendation +
-reasoning up top.
+`export`'s JSON is what step 3 (below) reads to build Devon's message. Don't hand-modify its
+ranking — if the ranking feels wrong, fix the underlying data (a wrong stop count, a
+miscategorized cabin) or the params, not the ordering.
+
+## Step 3 — present the options: message Devon, don't publish a report
+
+**No HTML report for now** — that whole presentation layer (report site, JSON report schema,
+`flights.waywardlane.com`) is on hold pending a separate design pass. The deliverable is an
+iMessage.
+
+Structure the message as:
+
+**A. The recommendation** — the #1 ranked row (adjusted-price winner among survivors), with a
+one-line reason (why it's the pick — usually just "cheapest that clears every constraint," but
+say if something else makes it a clear pick, e.g. a notably shorter layover).
+
+**B. 2-3 alternatives** — other rows worth naming, each with a concrete, specific reason to
+consider it over the #1 (meaningfully better timing, existing loyalty status, sourced better
+seat quality, a real price-vs-risk tradeoff on a hub-hack option). Never list an alternative with
+a generic "also decent" — if there's no real edge to name, don't include it padding out to 3.
+
+**C. Search-scale statistics** — a short numeric summary, not prose: how many sources checked,
+how many strategies run, how many queries executed, how many results returned (raw, then
+deduped), how many filtered out and why. Pull these straight from `flightdb search show
+--json` and the `export` ranking block — don't recompute by hand.
+
+Keep the whole message tight — this is iMessage, not a report page. A short recommendation
+paragraph, a short list of alternatives, a couple lines of stats. If Devon wants the full ranked
+field beyond the top handful, that's available on request via `flightdb export`/`rank` directly
+— don't dump all 15-20 rows into the message by default.
 
 ## References
 
-- `references/methodology.md` — full methodology detail: open-jaw specifics, the hub-hacking
-  buffer-time table, fare-calendar tool list, market-arbitrage mechanics, business-cabin
-  tactics, and the hidden-city risk writeup. Read it when a search needs the deeper technique
-  detail; the SKILL.md body stays focused on the workflow.
-- `references/report-template.md` — the report template + on-disk JSON schema (single source of
-  truth for report shape) + the worked example.
-- `assets/example-report.json` — the exact JSON of the baked-in example report (also live on the
-  site as `sfo-tokyo-nov2026`) so future-Sunny can see the expected shape without a live fetch.
+- `references/methodology.md` — open-jaw specifics, the hub-hacking buffer-time table,
+  fare-calendar tool list, market-arbitrage mechanics, business-cabin tactics. (Its old
+  hidden-city section is no longer part of the active workflow — kept only as background if
+  Devon asks about the technique directly.)
+- `~/.sunny/data/projects/flightdb/README.md` — the full schema + CLI reference for every
+  command referenced above.
 
 ## Don'ts
 
 - Don't do a quick single-source lookup unless Devon explicitly asked for "quick"/"just one thing."
-- Don't assume cabin class — ask per traveler, every search.
-- Don't assume a stop tolerance — ask max stops per leg every search (it's a hard constraint,
-  and it's where long-haul international savings hide). Never silently default to nonstop-only.
-- Don't collapse the field into one hidden weighted score, and don't hand down a recommendation
-  separate from the table — the recommendation IS the top row of the visible ranked field.
-- Don't invent a `seat_quality_note` — populate it only from a cited source, else leave it null.
-- Don't hide the points→cash valuation — show the per-point rate on the report, every award row.
-- Don't skip the date-matrix sweep when dates are flexible, or skip Seats.aero on a business search.
-- Don't recommend a positioning flight unless business-class savings exceed $1,000; always show
-  the separate-ticket risk caveats regardless.
-- Don't present hidden-city/throwaway as a default; always attach the account/contract risk.
-- Don't repeat `flight-search-strategy`'s inflated source claims — be accurate about the 3
-  sources actually built (Google Flights, Ignav, Seats.aero).
-- Don't finish without publishing the report and sending Devon its direct URL.
+- Don't assume cabin class or stop tolerance — ask per traveler / every search.
+- Don't use Google Flights' calendar/price-graph view for the date sweep — it has no real
+  itinerary behind its numbers. Run real date-pair searches instead.
+- Don't cross-multiply every strategy against every date pair or market — funnel down to a
+  winning date first (Step 1), then run the narrower techniques once against it.
+- Don't rank by eye — use `flightdb export`/`rank`; if the order looks wrong, fix the data/params
+  feeding it, not the algorithm's output.
+- Don't hide the points→cash valuation — always show the per-point rate and the conversion math.
+- Don't recommend a positioning flight unless business-class savings exceed $1,000; always name
+  the risk caveats regardless of recommendation.
+- Don't run hidden-city/throwaway as a standing strategy — it's cut from the default funnel.
+- Don't publish an HTML report right now — message Devon per Step 3 instead.
+- Don't invent loyalty program logic or a seat-quality note without a cited source — loyalty
+  scoring is cut from this version entirely; a seat-quality note (if you have one) still needs a
+  real citation or it's omitted.

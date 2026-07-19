@@ -126,7 +126,12 @@ Same route/date genuinely prices differently by which country storefront you sea
   (Going/Scott's Cheap Flights, Thrifty Traveler, Secret Flying), NOT on-demand API search. Worth
   a one-line mention that monitoring services exist; not buildable as an on-demand search here.
 
-## 6. Hidden-city & throwaway ticketing — LEGAL/POLICY RISK (flag every time)
+## 6. Hidden-city & throwaway ticketing — background only, NOT part of the active workflow
+
+**As of the 2026-07-19 rewrite, this is cut from the default search funnel** (SKILL.md's Step 1
+no longer runs it). Devon rarely uses this technique and it carries real account risk for the
+value it adds. Kept here only as reference if he asks about it directly as a one-off question —
+do not surface it unprompted in a normal search.
 
 - **Hidden-city:** book a longer published fare and skip the final connecting segment, because
   carriers sometimes price a longer routing below the shorter nonstop in premium cabins (thinner

@@ -35,6 +35,15 @@ python3 ~/.sunny/skills/authored/skills/craft/scripts/craft_mcp.py write "blocks
 (Cloudflare bot detection → 403 "browser_signature_banned"). `craft_mcp.py` already
 sends one; don't strip it if you ever hand-roll a request.
 
+**OAuth troubleshooting** (learned the hard way, 2026-07-16): the redirect URI is
+`https://snny.ai/dashboard/api/mcp/oauth/callback` (from `DASHBOARD_PUBLIC_URL`;
+`sunny.waywardlane.com` is dead — never use it). If the provider answers a consent
+link with `Unregistered redirect_uri`, the STORED client registration in
+`~/.sunny/mcp-oauth/craft.json` is stale (registered against an old domain). Run
+`mcp_manage` action `"reauthorize"` to wipe it and register a fresh client — do NOT
+hand-edit the consent link's redirect_uri, and don't trust `remove`+`add` from before
+2026-07-18 (older builds left the stale client file behind).
+
 - **Reading a linked page's real content is a separate, general-purpose skill:
   `skill:web-fetch`.** Read that skill for the full extraction strategy (trafilatura
   → optional Firecrawl fallback for JS-rendered pages → meta-tag fallback), setup,
