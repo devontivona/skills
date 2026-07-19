@@ -65,22 +65,17 @@ Batch ~3 questions per iMessage turn. Ask for whatever's missing:
 
 ## Step 1 — collect and store the data
 
-This is the part that changed most. Searches are NOT a flat cross-product of every technique ×
-every date × every market — that explodes combinatorially and most of it is redundant. But a
-strict single-winner funnel (find ONE cheapest date, then run everything else against only that
-date) is also wrong: it silently assumes the cheapest date pair for baseline round-trip pricing
-is ALSO the cheapest date pair for a currency-arbitrage market, or for a completely different
-open-jaw itinerary, or for a positioning leg's own pricing. That's not guaranteed —
-market-arbitrage is mostly a point-of-sale markup so it usually transfers, but open-jaw and
-hub-hack involve genuinely different flights with their own day-of-week pricing patterns, so the
-"winning" date from a baseline sweep isn't a safe assumption for them.
+Searches are run as a **funnel to a shortlist** — not a flat cross-product of every technique ×
+every date × every market (that explodes combinatorially and most of it is redundant), and not a
+funnel to a single winning date either (that silently assumes the cheapest date for baseline
+round-trip pricing is also cheapest for a currency-arbitrage market, or for a completely
+different open-jaw itinerary, or for a positioning leg with its own day-of-week pricing — not a
+safe assumption, since open-jaw and hub-hack involve genuinely different flights).
 
-The resolution: **funnel to a shortlist, not a single winner.** Run the cheap/broad steps first,
-keep the **top 2-3 candidates** (not just #1), and run the narrower/costlier techniques against
-that shortlist. This bounds the combinatorics to roughly a 2-3x multiplier on the later steps
-instead of either extreme (1x misses real winners; a full 6-8x cross-product on every technique
-is combinatorial excess). Total query count for a full comprehensive search should land around
-~25-40, not hundreds.
+The shape: run the cheap/broad steps first, keep the **top 2-3 candidates** (not just #1), and
+run the narrower/costlier techniques against that shortlist. This keeps total query count for a
+full comprehensive search around ~25-40, and still catches cases where a different date wins
+once the market or itinerary structure changes.
 
 **0. Create the search in flightdb first.**
 ```bash
@@ -93,30 +88,26 @@ Store every intake answer in `--params` — it's the audit trail for what was ac
 This seeds the funnel and is the reference every other strategy is compared against. Always run
 this one. Log each source hit as a `query`, log every itinerary it returns as a `result`.
 
-**2. Flex-date-sweep strategy — ONLY if dates are flexible, and ONLY with real result-list
+**2. Flex-date-sweep strategy — only if dates are flexible, and only with real result-list
 searches.** Do NOT use Google Flights' calendar/price-graph view for this — it shows a per-day
 price NUMBER with no actual bookable itinerary behind it, which is useless for a `result` row
 (no airline, no stops, no times — nothing to rank or book). Instead, run a bounded set of
 **real** date-pair searches (~6-8 pairs spread across the window, not every combination) against
 Google Flights (and Ignav if the window is small enough to be worth it), each logged as its own
 `query` with its own `result` rows. The strategy's job is to produce a **shortlist of the 2-3
-cheapest real date pairs** — narrow the funnel to those, not to a single winner, before
-continuing.
+cheapest real date pairs** — not a single winner.
 
-**3. Everything after this runs against the shortlisted date pair(s) from step 2 (or the fixed
-dates from step 1 if there was no sweep) — NOT against every date pair originally tried.** This
-is the answer to "how do open-jaw / market-arbitrage combine with date sweeping": they don't
-cross-multiply with the full sweep, but they DO check each shortlisted candidate (2-3, not 6-8) —
-enough to catch a case where the "obvious" cheapest baseline date isn't actually the best date
-once a different market or a different itinerary structure is factored in.
+**3. Everything after this runs against the shortlisted date pair(s)** from step 2 (or the fixed
+dates from step 1 if there was no sweep) — not against every date pair originally tried, and not
+collapsed to a single assumed-best date:
    - **Market-arbitrage strategy (international routes).** Re-run each shortlisted date pair via
      Google Flights `&gl=XX` and Ignav's `market` param for 2 country markets (departure +
      destination). Ask before a 3rd. Cheap to extend across the shortlist since it's the same
      query mechanism with one parameter changed.
    - **Open-jaw strategy (if warranted).** Compare open-jaw (into A, out of B) against the
-     round-trip-into-one-gateway baseline, for each shortlisted date pair — don't assume the
-     baseline's cheapest date is automatically open-jaw's cheapest date too, since it's a
-     different set of flights entirely.
+     round-trip-into-one-gateway baseline, for each shortlisted date pair — a different set of
+     flights than the baseline, so it needs its own check rather than inheriting baseline's
+     cheapest date.
    - **Hub-hack strategy (when a positioning leg could plausibly beat a through-fare).**
      Calculate a positioning-leg + separate-long-haul-ticket combo for each shortlisted date
      pair (the positioning leg has its own day-of-week pricing, independent of the long-haul
@@ -127,7 +118,6 @@ once a different market or a different itinerary structure is factored in.
    - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play — log
      award availability for the shortlisted date pair(s) as its own strategy/queries.
 
-
 Log every query and every result via flightdb as you go:
 ```bash
 python3 flightdb.py strategy add --search <slug> --name flex-date-sweep --description "..."
@@ -136,14 +126,13 @@ python3 flightdb.py query add --strategy <id> --source google_flights --origin P
 python3 flightdb.py result add --query <id> --json '[{...}, {...}]'
 ```
 
-Cut techniques (do not run these — they were removed on review):
-- **Hidden-city / throwaway ticketing** — dropped. Rarely used, high account risk, low value for
-  how often it actually applies. If Devon explicitly asks about it in the future, treat it as a
-  one-off question, not a standing strategy in this funnel.
+Hidden-city / throwaway ticketing is not part of this funnel — rarely used, high account risk,
+low value for how often it actually applies. If Devon explicitly asks about the technique, treat
+it as a one-off question, not a standing strategy.
 
 ## Step 2 — rank the options (deterministic, code does it — not judgment)
 
-flightdb's `rank`/`export` commands already implement this as a **simple, deterministic Python
+flightdb's `rank`/`export` commands implement this as a **simple, deterministic Python
 algorithm** — filter, dedupe, sort — driven entirely by the search's stored params. Use it as-is;
 don't re-derive ranking logic by eye.
 
@@ -173,13 +162,9 @@ What it does, in order (see the flightdb README for the exact mechanics):
 ranking — if the ranking feels wrong, fix the underlying data (a wrong stop count, a
 miscategorized cabin) or the params, not the ordering.
 
-## Step 3 — present the options: message Devon, don't publish a report
+## Step 3 — present the options: message Devon
 
-**No HTML report for now** — that whole presentation layer (report site, JSON report schema,
-`flights.waywardlane.com`) is on hold pending a separate design pass. The deliverable is an
-iMessage.
-
-Structure the message as:
+The deliverable is an iMessage, structured as:
 
 **A. The recommendation** — the #1 ranked row (adjusted-price winner among survivors), with a
 one-line reason (why it's the pick — usually just "cheapest that clears every constraint," but
@@ -203,9 +188,7 @@ field beyond the top handful, that's available on request via `flightdb export`/
 ## References
 
 - `references/methodology.md` — open-jaw specifics, the hub-hacking buffer-time table,
-  fare-calendar tool list, market-arbitrage mechanics, business-cabin tactics. (Its old
-  hidden-city section is no longer part of the active workflow — kept only as background if
-  Devon asks about the technique directly.)
+  fare-calendar tool list, market-arbitrage mechanics, business-cabin tactics.
 - `~/.sunny/data/projects/flightdb/README.md` — the full schema + CLI reference for every
   command referenced above.
 
@@ -223,8 +206,7 @@ field beyond the top handful, that's available on request via `flightdb export`/
 - Don't hide the points→cash valuation — always show the per-point rate and the conversion math.
 - Don't recommend a positioning flight unless business-class savings exceed $1,000; always name
   the risk caveats regardless of recommendation.
-- Don't run hidden-city/throwaway as a standing strategy — it's cut from the default funnel.
-- Don't publish an HTML report right now — message Devon per Step 3 instead.
-- Don't invent loyalty program logic or a seat-quality note without a cited source — loyalty
-  scoring is cut from this version entirely; a seat-quality note (if you have one) still needs a
-  real citation or it's omitted.
+- Don't run hidden-city/throwaway as a standing strategy.
+- Don't publish an HTML report — message Devon per Step 3.
+- Don't invent loyalty program logic or a seat-quality note without a cited source — a
+  seat-quality note, if included, needs a real citation or it's omitted.
