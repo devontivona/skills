@@ -87,11 +87,19 @@ date-sensitivity actually is with the baseline's:**
 - **Market-arbitrage transfers well — keep its shortlist narrow (2-3 dates).** It reprices the
   SAME flights the baseline already found, just at a different point of sale. The demand curve
   that made a date cheap doesn't change by currency, so the baseline's cheap dates are a good bet
-  here too.
+  here too. **Run one probe date first** before committing to the full 2-3-date shortlist — if
+  the probe shows the arbitrage is a dead end (e.g. `&gl=XX` returns the same price as `&gl=US`,
+  or a market param produces no real delta after FX), stop there and log it as a null result
+  rather than burning the full shortlist confirming a foregone conclusion.
 - **Open-jaw and hub-hack transfer poorly — widen their shortlist to 5-6 dates.** Both involve
   genuinely different flights than the baseline (a different return city for open-jaw; two
   separate tickets with independent pricing for hub-hack), each with their own day-of-week
-  demand curve that has no reason to agree with the baseline's.
+  demand curve that has no reason to agree with the baseline's. For hub-hack specifically, run a
+  **cheap feasibility check first**: is a plausible positioning-leg saving even in the ballpark
+  of the $1,000-business threshold, roughly, before spending 5-6 real queries confirming it in
+  detail? If the origin is already close to the major hubs (e.g. no long detour needed), the
+  math is often foregone — skip straight to logging that as a non-viable strategy instead of
+  running it out.
 - **Award availability (Seats.aero) transfers worst of all — widen it to 5-6 dates too, treat it
   as close to independent of cash pricing.** Award space isn't demand-curve pricing, it's
   inventory release, which is lumpy and largely uncorrelated with cash fares. A date that's
@@ -102,12 +110,24 @@ This keeps the strategies that genuinely need more coverage covered, without re-
 blowup by widening every strategy uniformly. Total query count for a full comprehensive search
 lands roughly in the ~35-55 range depending on which strategies actually apply to the trip.
 
+**Which date axis is actually flexible matters — don't assume both legs are equally free.** A
+deadline-driven trip (arrive-by constraint + a fixed stay-length range) often collapses the
+OUTBOUND date to just 2-3 legal days while leaving the RETURN date genuinely open across the
+whole stay-length window. In that shape, sweep the axis that's actually free (return dates) and
+hold the constrained axis (outbound dates) to its legal set — don't spread sweep effort evenly
+across both axes by default; check which one the intake constraints actually leave open.
+
 **0. Create the search in flightdb first.**
 ```bash
 python3 ~/.sunny/data/projects/flightdb/flightdb.py search create \
-  --id <slug> --title "<route + month>" --params '{"cabin":"business","max_stops":1,"adults":2,...}'
+  --id <slug> --title "<route + month>" \
+  --params '{"cabin":"business","max_stops":1,"adults":2,"price_unit":"per_person",...}'
 ```
 Store every intake answer in `--params` — it's the audit trail for what was actually asked for.
+Always include `price_unit` (almost always `"per_person"` — confirm per source, since Ignav
+returns a total for the passenger count while Google Flights varies) so every query/result
+logged against this search agrees on the unit; mixing per-person and total-for-N rows without
+recording which is which breaks comparisons and dedup.
 
 **1. Baseline strategy — one fixed date pair (or the stated exact dates), all 3 sources.**
 This seeds the funnel and is the reference every other strategy is compared against. Always run
@@ -122,6 +142,19 @@ Google Flights (and Ignav if the window is small enough to be worth it), each lo
 `query` with its own `result` rows. The strategy's job is to rank all the real date pairs tried
 by price — the shortlist each downstream strategy draws from (2-3 or 5-6, per the split above)
 comes out of this one ranked list.
+
+**Every query on a search with a real arrival deadline must set `--arrival <date>`** (the
+destination-local landing date, which can be a day or two after `--depart` on a long-haul or
+dateline-crossing route) — this is what lets Step 2's `--arrive-by` filter actually enforce the
+deadline in code, instead of you checking it by eye per row. Skipping this on even a few queries
+means those rows silently bypass the deadline check (flightdb warns when this happens, but don't
+rely on the warning catching it after the fact — set `--arrival` as you go).
+
+**If the trip needs more than one cabin (e.g. 2 economy + 2 business), log EVERY query with its
+actual `--cabin`** — don't run economy-only queries and assume business scales the same way; the
+two cabins have different fares, different stop patterns, and sometimes different award
+availability entirely. Step 2's `export --per-cabin` handles combining them at ranking time; your
+job here is just to make sure both cabins are actually represented in the logged queries/results.
 
 **3. Everything after this runs against the appropriate shortlist from step 2** (or the fixed
 dates from step 1 if there was no sweep) — not against every date pair originally tried:
@@ -141,13 +174,17 @@ dates from step 1 if there was no sweep) — not against every date pair origina
      result, just never recommended.
    - **Seats.aero award cross-check.** Run whenever a business/first cash fare is in play, across
      the top 5-6 shortlisted date pairs — award inventory release is lumpy and largely
-     independent of cash pricing, so it gets the wider shortlist too, not the narrow one.
+     independent of cash pricing, so it gets the wider shortlist too, not the narrow one. When
+     logging a one-way award result (common — award availability is often asymmetric), note that
+     it will NOT compete against round-trip cash fares at ranking time by default (see Step 2)
+     — that's intentional, not a bug to work around.
 
 Log every query and every result via flightdb as you go:
 ```bash
 python3 flightdb.py strategy add --search <slug> --name flex-date-sweep --description "..."
 python3 flightdb.py query add --strategy <id> --source google_flights --origin PDX \
-  --destination AKL --depart 2026-11-21 --return 2026-12-06 --cabin business --adults 2 --max-stops 1
+  --destination AKL --depart 2026-11-21 --return 2026-12-06 --arrival 2026-11-23 \
+  --cabin business --adults 2 --max-stops 1
 python3 flightdb.py result add --query <id> --json '[{...}, {...}]'
 ```
 
@@ -161,31 +198,53 @@ flightdb's `rank`/`export` commands implement this as a **simple, deterministic 
 algorithm** — filter, dedupe, sort — driven entirely by the search's stored params. Use it as-is;
 don't re-derive ranking logic by eye.
 
+**Single-cabin search:**
 ```bash
 python3 ~/.sunny/data/projects/flightdb/flightdb.py export --search <slug> \
-  --cabin business --max-stops 1 --points-rate 1.4 --limit 20
+  --cabin business --max-stops 1 --arrive-by 2026-11-24 --depart-after 2026-11-20 \
+  --points-rate 1.4 --limit 20
 ```
 
-What it does, in order (see the flightdb README for the exact mechanics):
-1. **Hard-constraint filter first.** Drops any result violating a stated non-negotiable (wrong
-   cabin for a required-cabin traveler, stops over the max, misses an arrival deadline). Filtered
-   rows never appear downstream — not even greyed out. The filtered-out count is retained
-   (`ranking.filtered_out_count`) so the omission stays visible as a number, never silent.
-2. **Dedup.** Collapses repeat finds of the same itinerary surfaced by overlapping queries
+**Mixed-cabin search (e.g. 2 economy + 2 business) — use `--per-cabin`, not two separate
+`--cabin` calls you sum by hand:**
+```bash
+python3 ~/.sunny/data/projects/flightdb/flightdb.py export --search <slug> \
+  --per-cabin economy,business --max-stops 1 --arrive-by 2026-11-24 \
+  --points-rate 1.4 --limit 20
+```
+This runs the full pipeline once per cabin and returns a `combined_top_pick_total` (each cabin's
+#1 price, summed) — check the returned `price_scope` on each row before treating that total as
+final, since it's a sum of per-person figures, not automatically multiplied by traveler count.
+
+What the pipeline does, in order (see the flightdb README for the exact mechanics):
+1. **Hard-constraint filter first.** Drops any result violating a stated non-negotiable: wrong
+   cabin for a required-cabin traveler, stops over the max, misses `--arrive-by` (only enforced
+   on queries that actually logged an `--arrival` date — see Step 1's note), earlier than
+   `--depart-after`, or wrong `--leg-scope`. Filtered rows never appear downstream — not even
+   greyed out. The filtered-out count is retained (`ranking.filtered_out_count`) so the omission
+   stays visible as a number, never silent.
+2. **Leg-scope filter (default: round-trip only).** A bare one-way fare or award does NOT compete
+   against a complete round-trip itinerary by default — they answer different questions, and a
+   cheap one-way shouldn't silently become "the recommendation" for a round-trip search. Only
+   pass `--leg-scope one_way` or `--leg-scope any` when that's genuinely what you want ranked
+   (e.g. summing two one-ways for an open-jaw comparison).
+3. **Dedup.** Collapses repeat finds of the same itinerary surfaced by overlapping queries
    (`dedup_key`), so a rank position is one distinct itinerary, not a repeat.
-3. **Adjusted price.** Cash rows use the total price as-is. Award rows convert points to a
+4. **Adjusted price.** Cash rows use the total price as-is. Award rows convert points to a
    cash-equivalent using a stated, visible rate — default 1.4¢/point for business-class
    redemptions (a rule of thumb, cite it as such — e.g. The Points Guy's monthly valuations).
    Always show the conversion string (`"88,000 mi × 1.4¢ = $1,232 + $240 tax = $1,472"`), never
-   hide it.
-4. **Sort ascending by adjusted price.** Cash and award rows land on one sortable ranking because
-   step 3 already put them in comparable dollars.
-5. **Same inputs → same output, every time.** This is the whole point of pushing ranking into
+   hide it. Confirm every row's `price_scope` (per-person vs a group total) before comparing
+   across sources — flightdb records this per result, but a source that returns a group total
+   needs it set explicitly at `result add` time (see Step 1).
+5. **Sort ascending by adjusted price.** Cash and award rows land on one sortable ranking because
+   step 4 already put them in comparable dollars.
+6. **Same inputs → same output, every time.** This is the whole point of pushing ranking into
    code instead of doing it by eye — a re-run against unchanged data reproduces the same order.
 
 `export`'s JSON is what step 3 (below) reads to build Devon's message. Don't hand-modify its
 ranking — if the ranking feels wrong, fix the underlying data (a wrong stop count, a
-miscategorized cabin) or the params, not the ordering.
+miscategorized cabin, a missing `--arrival` date) or the params, not the ordering.
 
 ## Step 3 — present the options: message Devon
 
@@ -230,6 +289,12 @@ field beyond the top handful, that's available on request via `flightdb export`/
   pattern.
 - Don't rank by eye — use `flightdb export`/`rank`; if the order looks wrong, fix the data/params
   feeding it, not the algorithm's output.
+- Don't let a one-way fare/award compete against round-trip itineraries — `rank`/`export` default
+  to `--leg-scope round_trip` for exactly this reason; only widen it deliberately.
+- Don't run two separate `--cabin` export calls and sum them by hand for a mixed-cabin trip — use
+  `--per-cabin`.
+- Don't claim an arrival deadline is enforced unless every relevant query logged `--arrival` and
+  you passed `--arrive-by` at ranking time — check for `warning_no_arrival_date` in the output.
 - Don't hide the points→cash valuation — always show the per-point rate and the conversion math.
 - Don't recommend a positioning flight unless business-class savings exceed $1,000; always name
   the risk caveats regardless of recommendation.
