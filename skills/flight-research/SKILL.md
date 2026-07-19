@@ -12,6 +12,17 @@ lookup — UNLESS Devon explicitly asks for a "quick" check or "just look at one
 Tell Devon up front a full search takes a bit (multiple sources, possibly a date sweep), so he
 knows it's not an instant reply.
 
+## Delegate this — don't run it in the main conversation
+
+This process is long (dozens of browser/API queries across 3 sources, multiple strategies,
+flightdb writes, then ranking) and does not need Devon's live input once intake is done — it's
+exactly the "bounded or long-running work" the **delegation skill** (`skill:delegation`) exists
+for. Once intake (below) is answered, hand the whole Step 1 → Step 2 → Step 3 process to a
+subagent via `delegate_task` rather than grinding through it in the main thread: give the child
+the full intake answers, this skill's path, and the flightdb path, and have it report back with
+the finished Step 3 message. Don't run the search inline — it will hold the conversation hostage
+and risks the turn cap.
+
 ## Glossary — use these terms consistently, everywhere
 
 - **Search** — the whole flight-research project for one trip, e.g. "PDX→Auckland Nov 2026." One
