@@ -81,6 +81,14 @@ restoration, multi-step visual stories). Read that file whenever the task is one
   separate post-processing step (e.g. a background-removal tool) — don't rely on the prompt alone,
   and say so plainly rather than claiming the output is transparent when it isn't.
 
+- Specific/NAMED object shapes drift when described only in words. Asking for a precise
+  silhouette by name (e.g. "a Nick and Nora glass") repeatedly produced a generic
+  coupe/wine-glass instead — the model averages toward the common shape. FIX: pass a real
+  photo of the exact object as a `--ref` (or `--image` on edit); a shape reference nails it
+  where prose can't. (Cocktail-poster job 2026-07-28: burned ~6 word-only rounds, then one
+  Wikimedia Nick-and-Nora photo fixed the glass immediately.) Same for "clear/transparent
+  glass" material — words alone gave flat opaque tan; anchor material with a reference too.
+
 ## CRITICAL: never batch a generate call and its send_image in the same tool-call block
 
 **This is the #1 real-world failure mode with this skill — read before your first call.**
