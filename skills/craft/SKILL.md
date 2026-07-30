@@ -35,11 +35,30 @@ python3 ~/.sunny/skills/authored/skills/craft/scripts/craft_mcp.py write "blocks
 (Cloudflare bot detection → 403 "browser_signature_banned"). `craft_mcp.py` already
 sends one; don't strip it if you ever hand-roll a request.
 
-**OAuth troubleshooting** (learned the hard way, 2026-07-16): the redirect URI is
+**OAuth — don't mint links speculatively (ROOT CAUSE of the 07-27→07-30 outage saga).**
+Craft OAuth appeared to "drop" multiple times a day for days. It was NOT Craft dropping
+tokens: it was our OWN scheduled jobs (heartbeat every 3h, task-assistant 7am, tagger 5am)
+each independently calling `mcp_manage probe`/`reauthorize` on a read failure to mint a
+diagnostic link for their report. Every `probe` writes a fresh PKCE `state`/`codeVerifier`
+into the shared token file, invalidating any previously-issued link; `reauthorize` is worse
+— it churns the whole `client_id`. So with 5+ jobs/day re-minting, ANY link sent to Devon
+was already dead before he could tap it. He wasn't slow; the links were being invalidated
+out from under him. When a `craft_read` fails with an auth/consent error, follow this order:
+1. Try an actual `craft_read` FIRST — a read failure elsewhere may be transient; if it now
+   succeeds, Craft is fine, report nothing.
+2. If it truly fails on auth, check (recall_history / recent reports) whether a consent link
+   was already sent in the last few hours. If so, it is plausibly still fresh — just note
+   "Craft still pending re-auth," do NOT mint a new one (minting kills the pending one).
+3. Only mint a fresh link if it's been a long stretch (several hours+) since the last, or
+   Devon said the old one didn't work. A plain `probe` is enough to get a link when needed.
+4. NEVER call `reauthorize` for a routine lapsed-consent ("needs to re-tap") case — that's
+   only for a genuinely broken client registration (see below).
+
+**Redirect-URI troubleshooting** (learned the hard way, 2026-07-16): the redirect URI is
 `https://snny.ai/dashboard/api/mcp/oauth/callback` (from `DASHBOARD_PUBLIC_URL`;
 `sunny.waywardlane.com` is dead — never use it). If the provider answers a consent
 link with `Unregistered redirect_uri`, the STORED client registration in
-`~/.sunny/mcp-oauth/craft.json` is stale (registered against an old domain). Run
+`~/.sunny/mcp-oauth/craft.json` is stale (registered against an old domain). ONLY then run
 `mcp_manage` action `"reauthorize"` to wipe it and register a fresh client — do NOT
 hand-edit the consent link's redirect_uri, and don't trust `remove`+`add` from before
 2026-07-18 (older builds left the stale client file behind).
