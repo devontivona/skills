@@ -45,6 +45,15 @@ scratch; import it.
 - Write/control tools act on REAL devices (locks, climate, automations).
   Confirm with the owner before any non-trivial change (restarts, deletes,
   automation edits) — same rule as the native tools.
+- BEST-PRACTICES WRITE GATE (added 2026-08-18): write tools
+  (`ha_config_set_automation` etc.) require a rotating `BestPracticeKey`. First
+  call `ha_get_skill_guide(skill='home-assistant-best-practices',
+  file='references/automation-patterns.md')` to obtain the key, then pass it as
+  the `BestPracticeKey` arg on the write. Pass `MandatoryBPS=False` on later
+  writes in the same session to skip re-receiving the full guide text. Note:
+  `ha_config_set_automation`'s write arg is `identifier` (not `automation_id`),
+  and the gate flags template expressions in `target:` fields as fragile — use
+  explicit per-entity conditions/targets, not templated ones.
 - LAN-only: riker.local is unreachable off Devon's home network; expect
   connection errors elsewhere.
 - Facts about the home itself (entity quirks, Sonos layout, lock states) live
